@@ -1,0 +1,31 @@
+package io.luan.exp4j.parser.syntactic;
+
+public enum SyntaxNodeType {
+    None,
+    Number,
+    Variable,
+    Parameter,
+    Constant,
+    Function,
+    UnaryNegative,
+    BinaryAdd,
+    BinarySubtract,
+    BinaryMultiply,
+    BinaryDivide,
+    BinaryMod,
+    BinaryPower,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
+    Equal,
+    NotEqual,
+    LogicalNot,
+    LogicalAnd,
+    LogicalOr,
+    BitwiseNot,
+    BitwiseAnd,
+    BitwiseOr,
+    TernaryQuestion,
+    TernaryColon
+}
