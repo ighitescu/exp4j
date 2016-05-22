@@ -23,8 +23,11 @@
     <groupId>io.luan</groupId>
     <artifactId>exp4j</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>${artifactId}</name>
+    <description>Expression for Java</description>
+    <url>https://github.com/luangm/exp4j</url>
 
-    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -34,5 +37,17 @@
         </dependency>
     </dependencies>
 
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
