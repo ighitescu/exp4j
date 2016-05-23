@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j;
+package io.luan.exp4j.parser.syntactic;
 
-public class Config {
-    public static final boolean DEBUG = true;
+public class SyntaxParserException extends RuntimeException {
+
+    public SyntaxParserException() {
+
+    }
+
+    public SyntaxParserException(String message) {
+        super(message);
+    }
 
 }

@@ -33,8 +33,8 @@ import java.util.Stack;
  */
 public class SyntaxParser {
 
-    private static final ParserException ArgEx = new ParserException("The string cannot be parsed.");
-    private static final ParserException BracketEx = new ParserException("Bracket Mismatch.");
+    private static final SyntaxParserException ArgEx = new SyntaxParserException("The string cannot be parsed.");
+    private static final SyntaxParserException BracketEx = new SyntaxParserException("Bracket Mismatch.");
 
     private Lexer lexer;
 
@@ -55,6 +55,34 @@ public class SyntaxParser {
 
         this.bracketCount = 0;
         this.lastToken = Token.EMPTY;
+    }
+
+    private static AssociativityType getAssociativity(TokenType tokenType) {
+        switch (tokenType) {
+            case Asterisk:
+            case Slash:
+            case Plus:
+            case Minus:
+            case GreaterThan:
+            case GreaterThanOrEqual:
+            case LessThan:
+            case LessThanOrEqual:
+            case Equate:
+            case NotEquate:
+            case LogicalAnd:
+            case LogicalOr:
+                return AssociativityType.Left;
+            case UnaryNegative:
+            case UnaryPositive:
+            case Caret:
+            case LogicalNot:
+            case BitwiseNot:
+            case QuestionMark:
+            case Colon:
+                return AssociativityType.Right;
+            default:
+                return AssociativityType.None;
+        }
     }
 
     /**
@@ -106,32 +134,33 @@ public class SyntaxParser {
         }
     }
 
-    private static AssociativityType getAssociativity(TokenType tokenType) {
-        switch (tokenType) {
-            case Asterisk:
-            case Slash:
-            case Plus:
-            case Minus:
-            case GreaterThan:
-            case GreaterThanOrEqual:
-            case LessThan:
-            case LessThanOrEqual:
-            case Equate:
-            case NotEquate:
-            case LogicalAnd:
-            case LogicalOr:
-                return AssociativityType.Left;
-            case UnaryNegative:
-            case UnaryPositive:
-            case Caret:
-            case LogicalNot:
-            case BitwiseNot:
-            case QuestionMark:
-            case Colon:
-                return AssociativityType.Right;
-            default:
-                return AssociativityType.None;
+    public SyntaxNode parse() {
+
+        Token token = lexer.take();
+        while (token != null) {
+            if (Config.DEBUG) {
+                System.out.println("[TOKEN] " + token);
+            }
+            parseToken(token);
+            token = lexer.take();
         }
+
+        // After all tokens are read, if there is still bracket left, there is mismatch.
+        if (bracketCount > 0) {
+            throw BracketEx;
+        }
+
+        while (opStack.size() > 0) {
+            SyntaxNode node = buildSyntaxNode(opStack.pop());
+            queue.push(node);
+        }
+
+        // There should only be the root node left on the queue;
+        if (queue.size() != 1) {
+            throw new SyntaxParserException("There should be only one root node");
+        }
+
+        return queue.firstElement();
     }
 
     private SyntaxNode buildSyntaxNode(Token token) {
@@ -178,6 +207,7 @@ public class SyntaxParser {
             case TernaryColon: // only 2 operands e.g. x:y
                 return 2;
             case UnaryNegative:
+            case UnaryPositive:
             case LogicalNot:
             case BitwiseNot:
                 return 1;
@@ -187,36 +217,7 @@ public class SyntaxParser {
             case Constant:
                 return 0;
         }
-        throw ArgEx;
-    }
-
-    public SyntaxNode parse() {
-
-        Token token = lexer.take();
-        while (token != null) {
-            if (Config.DEBUG) {
-                System.out.println("[TOKEN] " + token);
-            }
-            parseToken(token);
-            token = lexer.take();
-        }
-
-        // After all tokens are read, if there is still bracket left, there is mismatch.
-        if (bracketCount > 0) {
-            throw BracketEx;
-        }
-
-        while (opStack.size() > 0) {
-            SyntaxNode node = buildSyntaxNode(opStack.pop());
-            queue.push(node);
-        }
-
-        // There should only be the root node left on the queue;
-        if (queue.size() != 1) {
-            throw ArgEx;
-        }
-
-        return queue.firstElement();
+        throw new SyntaxParserException("Unrecognized SyntaxNode type: " + node.getType());
     }
 
     /**
@@ -378,12 +379,16 @@ public class SyntaxParser {
                 Token unaryToken = new Token(TokenType.UnaryNegative, "-");
                 opStack.push(unaryToken);
                 lastToken = unaryToken;
+            } else if (token.getType() == TokenType.Plus) {
+                Token unaryToken = new Token(TokenType.UnaryPositive, "+");
+                opStack.push(unaryToken);
+                lastToken = unaryToken;
             } else if (token.getType() == TokenType.LogicalNot) {
                 Token unaryToken = new Token(TokenType.LogicalNot, "!");
                 opStack.push(unaryToken);
                 lastToken = unaryToken;
             } else {
-                throw ArgEx;
+                throw new SyntaxParserException("An non-unary operator cannot go after an operator");
             }
         }
     }
@@ -427,8 +432,6 @@ public class SyntaxParser {
 
     private void parseToken(Token token) {
         switch (token.getType()) {
-            case None:
-                throw ArgEx;
             case Function:
                 parseFunction(token);
                 break;
@@ -470,7 +473,7 @@ public class SyntaxParser {
                 parseOperator(token);
                 break;
             default:
-                throw new ParserException("Unsupported TokenType: " + token.getType());
+                throw new SyntaxParserException("Unsupported TokenType: " + token.getType());
         }
     }
 

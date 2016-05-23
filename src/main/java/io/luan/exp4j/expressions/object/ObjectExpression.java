@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.parser.syntactic;
+package io.luan.exp4j.expressions.object;
 
-public class ParserException extends RuntimeException {
-
-    public ParserException() {
-
-    }
-
-    public ParserException(String message) {
-        super(message);
-    }
-
+/**
+ * Created by Miao on 5/23/2016.
+ */
+public class ObjectExpression {
 }

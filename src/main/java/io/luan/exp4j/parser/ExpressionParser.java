@@ -33,7 +33,7 @@ import io.luan.exp4j.expressions.symbolic.ConstantExpression;
 import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
-import io.luan.exp4j.parser.syntactic.ParserException;
+import io.luan.exp4j.parser.syntactic.SyntaxParserException;
 import io.luan.exp4j.parser.syntactic.SyntaxNode;
 import io.luan.exp4j.parser.syntactic.SyntaxNodeType;
 import io.luan.exp4j.parser.syntactic.SyntaxParser;
@@ -137,7 +137,7 @@ public class ExpressionParser {
                 return new LogicalAndExpression(operands);
             }
         }
-        throw new ParserException("All operands must be subtype of BooleanExpression");
+        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
     }
 
     private Expression buildLogicalNot(SyntaxNode node) {
@@ -160,7 +160,7 @@ public class ExpressionParser {
                 return new LogicalOrExpression(operands);
             }
         }
-        throw new ParserException("All operands must be subtype of BooleanExpression");
+        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
     }
 
     /**
@@ -178,6 +178,10 @@ public class ExpressionParser {
         return new SumExpression(operands, coefs);
     }
 
+    public Expression buildPositive(SyntaxNode node) {
+        return buildNode(node.getChildNodes().get(0));
+    }
+
     public Expression buildNode(SyntaxNode node) {
         switch (node.getType()) {
             case BinaryAdd:
@@ -192,6 +196,8 @@ public class ExpressionParser {
                 return buildPower(node);
             case UnaryNegative:
                 return buildNegation(node);
+            case UnaryPositive:
+                return buildPositive(node);
             case Variable:
                 return buildVariable(node);
             case Parameter:
@@ -218,9 +224,9 @@ public class ExpressionParser {
             case TernaryQuestion:
                 return buildTernary(node);
             case TernaryColon:
-                throw new ParserException("Ternary Colon must go after a Ternary QuestionMark");
+                throw new SyntaxParserException("Ternary Colon must go after a Ternary QuestionMark");
         }
-        throw new ParserException("Cannot parse node type: " + node.getType());
+        throw new SyntaxParserException("Cannot parse node type: " + node.getType());
     }
 
     public Expression buildNumber(SyntaxNode node) {
@@ -265,12 +271,12 @@ public class ExpressionParser {
     public Expression buildTernary(SyntaxNode node) {
         Expression cond = buildNode(node.getChildNodes().get(0));
         if (!(cond instanceof BooleanExpression)) {
-            throw new ParserException("conditional expression must be subtype of BooleanExpression");
+            throw new SyntaxParserException("conditional expression must be subtype of BooleanExpression");
         }
 
         SyntaxNode colonNode = node.getChildNodes().get(1);
         if (colonNode.getType() != SyntaxNodeType.TernaryColon) {
-            throw new ParserException("Ternary colon is required to follow a ternary question");
+            throw new SyntaxParserException("Ternary colon is required to follow a ternary question");
         }
 
         Expression ifTrue = buildNode(colonNode.getChildNodes().get(0));

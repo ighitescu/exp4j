@@ -61,6 +61,8 @@ public class SyntaxNode {
                 return SyntaxNodeType.BinaryPower;
             case UnaryNegative:
                 return SyntaxNodeType.UnaryNegative;
+            case UnaryPositive:
+                return SyntaxNodeType.UnaryPositive;
             case GreaterThan:
                 return SyntaxNodeType.GreaterThan;
             case GreaterThanOrEqual:
@@ -85,7 +87,7 @@ public class SyntaxNode {
                 return SyntaxNodeType.TernaryColon;
         }
 
-        throw new ParserException("Unsupported TokenType: " + tokenType);
+        throw new SyntaxParserException("Unsupported TokenType: " + tokenType);
     }
 
     public List<SyntaxNode> getChildNodes() {

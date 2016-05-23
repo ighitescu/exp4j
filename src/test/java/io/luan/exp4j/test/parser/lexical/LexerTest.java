@@ -12,7 +12,7 @@ import java.util.List;
 public class LexerTest {
 
     @Test
-    public void LexerTestAdd() {
+    public void testAdd() {
         List<Token> list = toList("123 + abc");
 
         assertSize(list, 3);
@@ -22,7 +22,7 @@ public class LexerTest {
     }
 
     @Test(expected = LexerException.class)
-    public void LexerTestBadNumberInput1() {
+    public void testBadNumberInput1() {
         try {
             Lexer lexer = new Lexer("123abc");
             lexer.take();
@@ -33,7 +33,7 @@ public class LexerTest {
     }
 
     @Test(expected = LexerException.class)
-    public void LexerTestBadNumberInput2() {
+    public void testBadNumberInput2() {
         try {
             Lexer lexer = new Lexer("123.");
             lexer.take();
@@ -44,7 +44,7 @@ public class LexerTest {
     }
 
     @Test(expected = LexerException.class)
-    public void LexerTestBadNumberInput3() {
+    public void testBadNumberInput3() {
         try {
             Lexer lexer = new Lexer(".a");
             lexer.take();
@@ -55,7 +55,7 @@ public class LexerTest {
     }
 
     @Test(expected = LexerException.class)
-    public void LexerTestBadNumberInput4() {
+    public void testBadNumberInput4() {
         try {
             Lexer lexer = new Lexer("2.a");
             lexer.take();
@@ -66,7 +66,7 @@ public class LexerTest {
     }
 
     @Test(expected = LexerException.class)
-    public void LexerTestBadNumberInput5() {
+    public void testBadNumberInput5() {
         try {
             Lexer lexer = new Lexer("2.1a");
             lexer.take();
@@ -77,7 +77,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestDecimal() {
+    public void testDecimal() {
         List<Token> list = toList("123.4");
 
         assertSize(list, 1);
@@ -85,28 +85,28 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestDecimalDot() {
+    public void testDecimalDot() {
         List<Token> list = toList(".5");
         assertSize(list, 1);
         assertToken(list, 0, TokenType.Decimal, ".5");
     }
 
     @Test
-    public void LexerTestEmpty1() {
+    public void testEmpty1() {
         Lexer lexer = new Lexer("");
         Token take = lexer.take();
         Assert.assertNull(take);
     }
 
     @Test
-    public void LexerTestEmpty2() {
+    public void testEmpty2() {
         Lexer lexer = new Lexer("  \t\r  ");
         Token take = lexer.take();
         Assert.assertNull(take);
     }
 
     @Test
-    public void LexerTestInteger() {
+    public void testInteger() {
         List<Token> list = toList("123");
 
         assertSize(list, 1);
@@ -114,7 +114,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestList() {
+    public void testList() {
         List<Token> list = toList("123 234 345");
 
         assertSize(list, 3);
@@ -124,7 +124,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestNoMore() {
+    public void testNoMore() {
         Lexer lexer = new Lexer("123");
         lexer.take();
 
@@ -136,13 +136,13 @@ public class LexerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void LexerTestNull() {
+    public void testNull() {
         Lexer lexer = new Lexer(null);
         lexer.take();
     }
 
     @Test
-    public void LexerTestOperators() {
+    public void testOperators() {
         List<Token> list = toList("+ - * /");
 
         assertSize(list, 4);
@@ -153,7 +153,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestPeekTake() {
+    public void testPeekTake() {
         Lexer lexer = new Lexer("123 abc");
 
         Token peek = lexer.peek();
@@ -166,7 +166,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestTakePeek() {
+    public void testTakePeek() {
         Lexer lexer = new Lexer("123 abc");
 
         Token take = lexer.take();
@@ -177,7 +177,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestTokenToString() {
+    public void testTokenToString() {
         // Only for test coverage purposes
 
         Lexer lexer = new Lexer("123");
@@ -188,7 +188,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestTokenTypes() {
+    public void testTokenTypes() {
         // for coverage only
         Assert.assertSame(true, TokenType.Integer.isOperand());
         Assert.assertSame(true, TokenType.Plus.isOperator());
@@ -196,7 +196,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestVariable() {
+    public void testVariable() {
         List<Token> list = toList("abc123");
 
         assertSize(list, 1);
@@ -204,7 +204,7 @@ public class LexerTest {
     }
 
     @Test
-    public void LexerTestWhitespaces() {
+    public void testWhitespaces() {
         List<Token> list = toList("  \r   123 \t  \n\r\t  +  \r\t\n   abc  \n  ");
 
         assertSize(list, 3);

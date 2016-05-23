@@ -24,6 +24,7 @@ public enum SyntaxNodeType {
     Constant,
     Function,
     UnaryNegative,
+    UnaryPositive,
     BinaryAdd,
     BinarySubtract,
     BinaryMultiply,
