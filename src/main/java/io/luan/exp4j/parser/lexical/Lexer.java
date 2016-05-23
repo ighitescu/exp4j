@@ -19,6 +19,10 @@ package io.luan.exp4j.parser.lexical;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Convert a String expression into a list of Tokens.
+ * The tokenization process is greedy.
+ */
 public class Lexer {
 
     private String expression = "";
@@ -40,59 +44,30 @@ public class Lexer {
         this.expression = expression.trim();
     }
 
-    public String getRemainingString() {
-        return this.expression.substring(this.currentPos);
-    }
-
     /**
-     * Convinence method to get all tokens for debugging purposes
-     * Real parsers only read one token + n lookup aheads to save on memory
+     * Convenience method to get all tokens for debugging purposes
+     * Real parsers only read one token + n lookup ahead to save on memory
      */
     public List<Token> getTokens() {
-        List<Token> list = new ArrayList<Token>();
-        while (this.hasMoreToken()) {
-            list.add(take());
+        List<Token> list = new ArrayList<>();
+        Token token = take();
+        while (token != null) {
+            list.add(token);
+            token = take();
         }
         return list;
-    }
-
-    public boolean hasMoreToken() {
-        return this.currentPos < this.expression.length();
-    }
-
-    /**
-     * Peek the next Token but not consume it.
-     */
-    public Token peek() {
-        return null;
-    }
-
-    private void reset() {
-        this.startPos = 0;
-        this.currentPos = 0;
-        this.lastPos = 0;
-    }
-
-    private void skipWhitespaces() {
-        if (currentPos >= expression.length()) {
-            return;
-        }
-
-        while (Character.isWhitespace(expression.charAt(currentPos))) {
-            currentPos++;
-        }
     }
 
     /**
      * Take the next Token and advance to next.
      */
     public Token take() {
-        if (!hasMoreToken()) {
+        if (currentPos >= expression.length()) {
             return null;
         }
 
         // starting state, if in the end still at the starting state, then
-        // stream ended, return false
+        // stream ended, return false`
         currState = TokenStates.Start;
 
         // state where last success was seen. if (success == 0) then an error
@@ -142,5 +117,24 @@ public class Lexer {
         TokenType successType = this.succState.getTerminalTokenType();
         String token = this.expression.substring(this.startPos, this.currentPos);
         return new Token(successType, token);
+    }
+
+    private void skipWhitespaces() {
+        while (Character.isWhitespace(expression.charAt(currentPos))) {
+            currentPos++;
+        }
+    }
+
+    /**
+     * Peek the next Token but not consume it.
+     */
+    public Token peek() {
+        return null;
+    }
+
+    private void reset() {
+        this.startPos = 0;
+        this.currentPos = 0;
+        this.lastPos = 0;
     }
 }

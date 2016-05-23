@@ -191,12 +191,14 @@ public class SyntaxParser {
     }
 
     public SyntaxNode parse() {
-        while (lexer.hasMoreToken()) {
-            Token token = lexer.take();
+
+        Token token = lexer.take();
+        while (token != null) {
             if (Config.DEBUG) {
                 System.out.println("[TOKEN] " + token);
             }
             parseToken(token);
+            token = lexer.take();
         }
 
         // After all tokens are read, if there is still bracket left, there is mismatch.
