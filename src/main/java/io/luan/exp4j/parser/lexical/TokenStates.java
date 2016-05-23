@@ -16,53 +16,53 @@
 
 package io.luan.exp4j.parser.lexical;
 
-public class TokenStates {
+class TokenStates {
 
-    public static final TokenState Start = TokenState.CreateStart("Start");
-    public static final TokenState Error = TokenState.CreateError("Error");
-    public static final TokenState Integer = TokenState.CreateTerminal("Integer").withTokenType(TokenType.Integer);
-    public static final TokenState IntegerDot = TokenState.CreateNonTerminal("IntegerDot");
-    public static final TokenState Decimal = TokenState.CreateTerminal("Decimal").withTokenType(TokenType.Decimal);
-    public static final TokenState DecimalExpPartial = TokenState.CreateNonTerminal("DecimalExpPartial");
-    public static final TokenState DecimalExpPlusMinusPartial = TokenState.CreateNonTerminal("DecimalExpPlusMinusPartial");
-    public static final TokenState DecimalExponent = TokenState.CreateTerminal("DecimalExponent").withTokenType(TokenType.Decimal);
-    public static final TokenState Variable = TokenState.CreateTerminal("Variable").withTokenType(TokenType.Variable);
-    public static final TokenState VariableBracket = TokenState.CreateNonTerminal("VariableBracket");
-    public static final TokenState VariableFull = TokenState.CreateTerminal("VariableFull").withTokenType(TokenType.Variable);
-    public static final TokenState ParameterStart = TokenState.CreateNonTerminal("ParameterStart");
-    public static final TokenState Parameter = TokenState.CreateTerminal("Parameter").withTokenType(TokenType.Parameter);
-    public static final TokenState ConstantStart = TokenState.CreateNonTerminal("ConstantStart");
-    public static final TokenState Constant = TokenState.CreateTerminal("Constant").withTokenType(TokenType.Constant);
-    public static final TokenState Function = TokenState.CreateTerminal("Function").withTokenType(TokenType.Function);
-    public static final TokenState Plus = TokenState.CreateTerminal("Plus").withTokenType(TokenType.Plus);
-    public static final TokenState Minus = TokenState.CreateTerminal("Minus").withTokenType(TokenType.Minus);
-    public static final TokenState Asterisk = TokenState.CreateTerminal("Asterisk").withTokenType(TokenType.Asterisk);
-    public static final TokenState Slash = TokenState.CreateTerminal("Slash").withTokenType(TokenType.Slash);
-    public static final TokenState Percent = TokenState.CreateTerminal("Percent").withTokenType(TokenType.Percent);
-    public static final TokenState Caret = TokenState.CreateTerminal("Power").withTokenType(TokenType.Caret);
-    public static final TokenState LeftParen = TokenState.CreateTerminal("LeftParen").withTokenType(TokenType.LeftParen);
-    public static final TokenState RightParen = TokenState.CreateTerminal("RightParen").withTokenType(TokenType.RightParen);
-    public static final TokenState Comma = TokenState.CreateTerminal("Comma").withTokenType(TokenType.Comma);
-    public static final TokenState Equal = TokenState.CreateTerminal("Equal").withTokenType(TokenType.Equal);
-    public static final TokenState GreaterThan = TokenState.CreateTerminal("GreaterThan").withTokenType(TokenType.GreaterThan);
-    public static final TokenState GreaterThanOrEqual = TokenState.CreateTerminal("GreaterThanOrEqual").withTokenType(TokenType.GreaterThanOrEqual);
-    public static final TokenState LessThan = TokenState.CreateTerminal("LessThan").withTokenType(TokenType.LessThan);
-    public static final TokenState LessThanOrEqual = TokenState.CreateTerminal("LessThanOrEqual").withTokenType(TokenType.LessThanOrEqual);
-    public static final TokenState Equate = TokenState.CreateTerminal("Equate").withTokenType(TokenType.Equate);
-    public static final TokenState LogicalNot = TokenState.CreateTerminal("LogicalNot").withTokenType(TokenType.LogicalNot);
-    public static final TokenState NotEquate = TokenState.CreateTerminal("NotEquate").withTokenType(TokenType.NotEquate);
-    public static final TokenState BitwiseAnd = TokenState.CreateTerminal("BitwiseAnd").withTokenType(TokenType.BitwiseAnd);
-    public static final TokenState LogicalAnd = TokenState.CreateTerminal("LogicalAnd").withTokenType(TokenType.LogicalAnd);
-    public static final TokenState BitwiseOr = TokenState.CreateTerminal("BitwiseOr").withTokenType(TokenType.BitwiseOr);
-    public static final TokenState LogicalOr = TokenState.CreateTerminal("LogicalOr").withTokenType(TokenType.LogicalOr);
-    public static final TokenState TernaryQuestion = TokenState.CreateTerminal("TernaryQuestion").withTokenType(TokenType.QuestionMark);
-    public static final TokenState TernaryColon = TokenState.CreateTerminal("TernaryColon").withTokenType(TokenType.Colon);
+    static final TokenState Start = TokenState.nonTerminal("Start");
+    static final TokenState Error = TokenState.error("Error");
+    static final TokenState Integer = TokenState.terminal("Integer", TokenType.Integer);
+    static final TokenState IntegerDot = TokenState.nonTerminal("IntegerDot");
+    static final TokenState Decimal = TokenState.terminal("Decimal", TokenType.Decimal);
+    static final TokenState DecimalExpPartial = TokenState.nonTerminal("DecimalExpPartial");
+    static final TokenState DecimalExpPlusMinusPartial = TokenState.nonTerminal("DecimalExpPlusMinusPartial");
+    static final TokenState DecimalExponent = TokenState.terminal("DecimalExponent", TokenType.Decimal);
+    static final TokenState Variable = TokenState.terminal("Variable", TokenType.Variable);
+    static final TokenState VariableBracket = TokenState.nonTerminal("VariableBracket");
+    static final TokenState VariableFull = TokenState.terminal("VariableFull", TokenType.Variable);
+    static final TokenState ParameterStart = TokenState.nonTerminal("ParameterStart");
+    static final TokenState Parameter = TokenState.terminal("Parameter", TokenType.Parameter);
+    static final TokenState ConstantStart = TokenState.nonTerminal("ConstantStart");
+    static final TokenState Constant = TokenState.terminal("Constant", TokenType.Constant);
+    static final TokenState Function = TokenState.terminal("Function", TokenType.Function);
+    static final TokenState Plus = TokenState.terminal("Plus", TokenType.Plus);
+    static final TokenState Minus = TokenState.terminal("Minus", TokenType.Minus);
+    static final TokenState Asterisk = TokenState.terminal("Asterisk", TokenType.Asterisk);
+    static final TokenState Slash = TokenState.terminal("Slash", TokenType.Slash);
+    static final TokenState Percent = TokenState.terminal("Percent", TokenType.Percent);
+    static final TokenState Caret = TokenState.terminal("Power", TokenType.Caret);
+    static final TokenState LeftParen = TokenState.terminal("LeftParen", TokenType.LeftParen);
+    static final TokenState RightParen = TokenState.terminal("RightParen", TokenType.RightParen);
+    static final TokenState Comma = TokenState.terminal("Comma", TokenType.Comma);
+    static final TokenState Equal = TokenState.terminal("Equal", TokenType.Equal);
+    static final TokenState GreaterThan = TokenState.terminal("GreaterThan", TokenType.GreaterThan);
+    static final TokenState GreaterThanOrEqual = TokenState.terminal("GreaterThanOrEqual", TokenType.GreaterThanOrEqual);
+    static final TokenState LessThan = TokenState.terminal("LessThan", TokenType.LessThan);
+    static final TokenState LessThanOrEqual = TokenState.terminal("LessThanOrEqual", TokenType.LessThanOrEqual);
+    static final TokenState Equate = TokenState.terminal("Equate", TokenType.Equate);
+    static final TokenState LogicalNot = TokenState.terminal("LogicalNot", TokenType.LogicalNot);
+    static final TokenState NotEquate = TokenState.terminal("NotEquate", TokenType.NotEquate);
+    static final TokenState BitwiseAnd = TokenState.terminal("BitwiseAnd", TokenType.BitwiseAnd);
+    static final TokenState LogicalAnd = TokenState.terminal("LogicalAnd", TokenType.LogicalAnd);
+    static final TokenState BitwiseOr = TokenState.terminal("BitwiseOr", TokenType.BitwiseOr);
+    static final TokenState LogicalOr = TokenState.terminal("LogicalOr", TokenType.LogicalOr);
+    static final TokenState TernaryQuestion = TokenState.terminal("TernaryQuestion", TokenType.QuestionMark);
+    static final TokenState TernaryColon = TokenState.terminal("TernaryColon", TokenType.Colon);
 
     static {
         registerTransitions();
     }
 
-    private static void registerTransitions() {
+    static void registerTransitions() {
         Start.addTransition(c -> Character.isDigit(c), TokenStates.Integer);
         Start.addTransition(c -> Character.isLetter(c), TokenStates.Variable);
         //Start.addTransition(c -> c == '_', TokenStates.Variable);	// Note: Do not allow initial underscore.
@@ -83,18 +83,23 @@ public class TokenStates {
         Integer.addTransition(c -> Character.isDigit(c), TokenStates.Integer);
         Integer.addTransition(c -> c == '.', TokenStates.IntegerDot);
         Integer.addTransition(c -> c == 'e' || c == 'E', TokenStates.DecimalExpPartial);
+        Integer.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         IntegerDot.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
 
         Decimal.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
         Decimal.addTransition(c -> c == 'e' || c == 'E', TokenStates.DecimalExpPartial);
+        Decimal.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         DecimalExpPartial.addTransition(c -> Character.isDigit(c), TokenStates.DecimalExponent);
         DecimalExpPartial.addTransition(c -> c == '+' || c == '-', TokenStates.DecimalExpPlusMinusPartial);
+        DecimalExpPartial.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         DecimalExpPlusMinusPartial.addTransition(c -> Character.isDigit(c), TokenStates.DecimalExponent);
+        DecimalExpPlusMinusPartial.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         DecimalExponent.addTransition(c -> Character.isDigit(c), TokenStates.DecimalExponent);
+        DecimalExponent.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         Variable.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Variable);
         Variable.addTransition(c -> c == '_', TokenStates.Variable);
@@ -137,6 +142,5 @@ public class TokenStates {
 
         Start.addTransition(c -> c == '?', TernaryQuestion);
         Start.addTransition(c -> c == ':', TernaryColon);
-
     }
 }

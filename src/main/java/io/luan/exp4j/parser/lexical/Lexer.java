@@ -27,21 +27,20 @@ public class Lexer {
 
     private String expression = "";
 
-    // start of the token
-    private int startPos = 0;
-
-    // One position AFTER the end of the token.
-    // Use string.substring(start, end-start).
+    // current cursor position.
     private int currentPos = 0;
 
-    // last successful match
+    // the END of last successful math
     private int lastPos = 0;
 
-    private TokenState currState = TokenStates.Start;
-    private TokenState succState;
+    // the last token. If exists, take consumes it, peek does not
+    private Token lastToken;
 
     public Lexer(String expression) {
-        this.expression = expression.trim();
+        if (expression == null) {
+            throw new IllegalArgumentException("expression cannot be null");
+        }
+        this.expression = expression;
     }
 
     /**
@@ -59,82 +58,96 @@ public class Lexer {
     }
 
     /**
-     * Take the next Token and advance to next.
+     * Check to see if additional token is possible
      */
-    public Token take() {
+    public boolean hasMore() {
         if (currentPos >= expression.length()) {
-            return null;
+            return false;
         }
-
-        // starting state, if in the end still at the starting state, then
-        // stream ended, return false`
-        currState = TokenStates.Start;
-
-        // state where last success was seen. if (success == 0) then an error
-        // encountered.
-        succState = TokenStates.Error;
 
         skipWhitespaces();
 
-        startPos = currentPos;
-        while (currentPos < expression.length()) {
-
-            char nextChar = expression.charAt(currentPos);
-            TokenResult result = currState.tryConsumeNextChar(nextChar);
-
-            TokenState nextState = result.getState();
-            if (false == result.isConsumed()) {
-                // if the next char cannot be consumed:
-                // If throws exception: means the char is unrecognized
-
-                currState = nextState;
-                if (currState.isTerminal()) {
-                    // When you hit a terminal token, store the last success
-                    // token and the location of it.
-                    // So when hit error the success state can be returned.
-                    succState = currState;
-                }
-                break;
-            }
-
-            this.currState = nextState;
-            if (this.currState.isTerminal()) {
-                // When you hit a terminal token, store the last success token
-                // and the location of it.
-                // So when hit error the success state can be returned.
-                this.succState = this.currState;
-                this.lastPos = this.currentPos;
-            }
-            this.currentPos++;
-        }
-
-        if (this.succState.isError()) {
-            throw new LexerException();
-        }
-
-        // TODO: find a way to store last read position and revert at the end for Peak.
-        this.currentPos = this.lastPos + 1;
-        TokenType successType = this.succState.getTerminalTokenType();
-        String token = this.expression.substring(this.startPos, this.currentPos);
-        return new Token(successType, token);
-    }
-
-    private void skipWhitespaces() {
-        while (Character.isWhitespace(expression.charAt(currentPos))) {
-            currentPos++;
-        }
+        return currentPos < expression.length();
     }
 
     /**
      * Peek the next Token but not consume it.
      */
     public Token peek() {
-        return null;
+        if (lastToken == null) {
+            lastToken = takeInternal();
+        }
+        return lastToken;
     }
 
-    private void reset() {
-        this.startPos = 0;
-        this.currentPos = 0;
-        this.lastPos = 0;
+    /**
+     * Take the next Token and advance to next.
+     */
+    public Token take() {
+        Token token;
+        // doesn't exist yet. Need to check if no more token
+        if (lastToken == null) {
+            if (!hasMore()) {
+                return null;
+            }
+            token = takeInternal();
+        } else {
+            token = lastToken;
+        }
+        lastToken = takeInternal();
+        return token;
+    }
+
+    private void skipWhitespaces() {
+        int len = expression.length();
+        while (currentPos < len && Character.isWhitespace(expression.charAt(currentPos))) {
+            currentPos++;
+        }
+    }
+
+    private Token takeInternal() {
+        if (!hasMore()) {
+            return null;
+        }
+
+        // starting state, if in the end still at the starting state, then stream ended, return false
+        TokenState currState = TokenStates.Start;
+
+        // state where last success was seen. if (success == 0) then an error encountered.
+        TokenState succState = TokenStates.Error;
+
+        int startPos = currentPos;
+        while (currentPos < expression.length()) {
+            char nextChar = expression.charAt(currentPos);
+            TokenRule result = currState.tryConsume(nextChar);
+            if (result.isFatal()) {
+                throw new LexerException(currentPos);
+            }
+
+            currState = result.getResultState();
+            if (!result.isConsumed()) {
+                if (currState.isTerminal()) {
+                    succState = currState;
+                }
+                break;
+            }
+
+            if (currState.isTerminal()) {
+                // When you hit a terminal token, store the last success token and the location of it.
+                // So when hit error the success state can be returned.
+                succState = currState;
+                lastPos = currentPos;
+            }
+            currentPos++;
+        }
+
+        if (succState.isError()) {
+            throw new LexerException(currentPos);
+        }
+
+        currentPos = lastPos + 1; // Reset currentPos
+        TokenType type = succState.getTerminalTokenType();
+        String text = expression.substring(startPos, currentPos);
+        return new Token(type, text);
     }
 }

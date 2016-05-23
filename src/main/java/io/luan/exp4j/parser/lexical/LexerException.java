@@ -17,14 +17,16 @@
 package io.luan.exp4j.parser.lexical;
 
 public class LexerException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = -981356716289251125L;
+    private int position;
 
-    public LexerException() {
-        super();
+    public LexerException(int position) {
+        super("Lexer cannot generate token at position: " + position);
+        this.position = position;
     }
 
-    public LexerException(String message) {
-        super(message);
+    public int getPosition() {
+        return position;
     }
 }

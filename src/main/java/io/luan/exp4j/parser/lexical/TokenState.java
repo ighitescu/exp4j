@@ -20,94 +20,81 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class TokenState {
+class TokenState {
 
-    private List<Predicate<Character>> rules = new ArrayList<>();
-    private List<Boolean> rulesConsume = new ArrayList<>();
-    private List<TokenState> resultStates = new ArrayList<>();
-
+    private List<TokenRule> rules = new ArrayList<>();
     private String name;
-
-    private boolean _isTerminal;
-
-    private boolean _isError;
-
-    private boolean _isStart;
-
+    private boolean isTerminal;
+    private boolean isError;
     private TokenType terminalTokenType;
 
     private TokenState(String name) {
         this.name = name;
     }
 
-    public static TokenState CreateError(String name) {
+    static TokenState error(String name) {
         TokenState state = new TokenState(name);
-        state._isError = true;
+        state.isError = true;
         return state;
     }
 
-    public static TokenState CreateNonTerminal(String name) {
+    static TokenState nonTerminal(String name) {
+        return new TokenState(name);
+    }
+
+    static TokenState terminal(String name, TokenType terminalType) {
         TokenState state = new TokenState(name);
+        state.isTerminal = true;
+        state.terminalTokenType = terminalType;
         return state;
-    }
-
-    public static TokenState CreateStart(String name) {
-        TokenState state = new TokenState(name);
-        state._isStart = true;
-        return state;
-    }
-
-    public static TokenState CreateTerminal(String name) {
-        TokenState state = new TokenState(name);
-        state._isTerminal = true;
-        return state;
-    }
-
-    public void addTransition(Predicate<Character> canApply, TokenState resultState) {
-        addTransition(canApply, resultState, true);
-    }
-
-    public void addTransition(Predicate<Character> canApply, TokenState resultState, boolean consume) {
-        this.rules.add(canApply);
-        this.rulesConsume.add(consume);
-        this.resultStates.add(resultState);
     }
 
     public String getName() {
         return name;
     }
 
-    public TokenType getTerminalTokenType() {
+    @Override
+    public String toString() {
+        return getName() + (isTerminal ? " Terminal" : " NonTerminal");
+    }
+
+    void addTransition(Predicate<Character> canApply, TokenState resultState) {
+        addTransition(canApply, resultState, true, false);
+    }
+
+    void addTransition(Predicate<Character> canApply, TokenState resultState, boolean consume) {
+        addTransition(canApply, resultState, consume, false);
+    }
+
+    void addTransition(Predicate<Character> canApply, TokenState resultState, boolean consume, boolean fatal) {
+        TokenRule rule = new TokenRule(canApply, resultState, consume, fatal);
+        rules.add(rule);
+    }
+
+    void addFatal(Predicate<Character> canApply) {
+        addTransition(canApply, null, false, true);
+    }
+
+    TokenType getTerminalTokenType() {
         return terminalTokenType;
     }
 
-    public boolean isError() {
-        return _isError;
+    boolean isError() {
+        return isError;
     }
 
-    public boolean isStart() {
-        return _isStart;
+    boolean isTerminal() {
+        return isTerminal;
     }
 
-    public boolean isTerminal() {
-        return _isTerminal;
-    }
-
-    public TokenResult tryConsumeNextChar(char c) {
-        for (int i = 0; i < rules.size(); i++) {
-            Predicate<Character> rule = rules.get(i);
+    TokenRule tryConsume(char c) {
+        for (TokenRule rule : rules) {
             if (rule.test(c)) {
-                TokenState result = this.resultStates.get(i);
-                boolean consumed = rulesConsume.get(i);
-                return new TokenResult(result, consumed);
+                return rule;
             }
         }
-
-        return new TokenResult(this, false);
+        return new TokenRule(null, this, false, false);
     }
 
-    public TokenState withTokenType(TokenType tokenType) {
-        this.terminalTokenType = tokenType;
-        return this;
-    }
+
 }
