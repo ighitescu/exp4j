@@ -21,8 +21,9 @@ import io.luan.exp4j.parser.lexical.Lexer;
 import io.luan.exp4j.parser.lexical.Token;
 import io.luan.exp4j.parser.lexical.TokenType;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import static io.luan.exp4j.parser.syntactic.SyntaxParserUtil.getAssociativity;
@@ -43,21 +44,29 @@ public class SyntaxParser {
 
     private Stack<Token> opStack;
     private Stack<SyntaxNode> queue;
-    private List<Token> funcList;
-    private List<Integer> funcOperands;
+
+    // Keeps track of all func's operands
+    private Map<Token, Stack<SyntaxNode>> funcOperandsMap;
+
+    // Keeps track of the funcs
+    private Stack<Token> funcStack;
+
+    // Key = operator, value = func, could be null if no func
+    private Map<Token, Token> opFuncMap;
 
     private int bracketCount;
     private Token lastToken;
 
     public SyntaxParser(String expression) {
-        this.lexer = new Lexer(expression);
-        this.opStack = new Stack<>();
-        this.queue = new Stack<>();
-        this.funcList = new ArrayList<>();
-        this.funcOperands = new ArrayList<>();
+        lexer = new Lexer(expression);
+        opStack = new Stack<>();
+        queue = new Stack<>();
+        funcStack = new Stack<>();
+        funcOperandsMap = new HashMap<>();
+        opFuncMap = new HashMap<>();
 
-        this.bracketCount = 0;
-        this.lastToken = Token.EMPTY;
+        bracketCount = 0;
+        lastToken = Token.EMPTY;
     }
 
 
@@ -78,8 +87,7 @@ public class SyntaxParser {
         }
 
         while (opStack.size() > 0) {
-            SyntaxNode node = buildSyntaxNode(opStack.pop());
-            queue.push(node);
+            handleTopOperator();
         }
 
         // There should only be the root node left on the queue;
@@ -98,13 +106,23 @@ public class SyntaxParser {
             SyntaxNode node = this.queue.pop();
             stack.push(node);
         }
+
+        // Handle func params
+        Token funcToken = opFuncMap.get(token);
+        if (funcToken != null) {
+            Stack<SyntaxNode> funcOpStack = funcOperandsMap.get(funcToken);
+            for (int i = 0; i < operandCount; i++) {
+                funcOpStack.pop();
+            }
+        }
+
         while (stack.size() > 0) {
             syntaxNode.getChildNodes().add(stack.pop());
         }
 
         if (token.getType() == TokenType.Function) {
-            this.funcList.remove(this.funcList.size() - 1);
-            this.funcOperands.remove(this.funcOperands.size() - 1);
+//            this.funcList.remove(this.funcList.size() - 1);
+//            this.funcOperands.remove(this.funcOperands.size() - 1);
         }
         return syntaxNode;
     }
@@ -112,9 +130,8 @@ public class SyntaxParser {
     private int getOperandCount(SyntaxNode node) {
         switch (node.getType()) {
             case Function:
-                // String nodeText = node.getToken().getText();
-                // String funcText = funcList.get(funcList.size() - 1).getText();
-                return this.funcOperands.get(funcOperands.size() - 1) + 1;
+                List<SyntaxNode> list = funcOperandsMap.get(node.getToken());
+                return list.size();
 
             case BinaryAdd:
             case BinarySubtract:
@@ -132,6 +149,7 @@ public class SyntaxParser {
             case LogicalOr:
             case TernaryQuestion: // only 2 operands e.g. a ? (x:y)
             case TernaryColon: // only 2 operands e.g. x:y
+            case Dot:
                 return 2;
             case UnaryNegative:
             case UnaryPositive:
@@ -143,6 +161,18 @@ public class SyntaxParser {
                 return 0;
         }
         throw new SyntaxParserException("Unrecognized SyntaxNode type: " + node.getType());
+    }
+
+    private void handleTopOperator() {
+        Token top = opStack.pop();
+        SyntaxNode node = buildSyntaxNode(top);
+        queue.push(node);
+
+        Token funcToken = opFuncMap.get(top);
+        if (funcToken != null) {
+            Stack<SyntaxNode> operandStack = funcOperandsMap.get(funcToken);
+            operandStack.push(node);
+        }
     }
 
     /**
@@ -167,11 +197,19 @@ public class SyntaxParser {
             throw ArgEx;
         }
 
+        while (opStack.size() > 0) {
+            if (opStack.peek().getType() == TokenType.LeftParen) {
+                break;
+            } else {
+                handleTopOperator();
+            }
+        }
+
         // comma is added whenever it's encountered. The comma count should
         // always be added to the last func.
-        int index = funcOperands.size() - 1;
-        int count = funcOperands.get(index);
-        funcOperands.set(index, count++);
+//        int index = funcOperands.size() - 1;
+//        int count = funcOperands.get(index);
+//        funcOperands.set(index, count + 1);
         lastToken = token;
     }
 
@@ -190,13 +228,18 @@ public class SyntaxParser {
             throw ArgEx;
         }
 
-        this.opStack.push(token);
+        opStack.push(token);
 
-        // also put into func list
-        this.funcList.add(token);
-        this.funcOperands.add(0);
+        if (!funcStack.isEmpty()) {
+            Token funcToken = funcStack.peek();
+            Stack<SyntaxNode> opStack = funcOperandsMap.get(funcToken);
+            opStack.push(new SyntaxNode(token));
+        }
+        // also put into func stack;
+        funcStack.push(token);
+        funcOperandsMap.put(token, new Stack<>());
 
-        this.lastToken = token;
+        lastToken = token;
     }
 
     /**
@@ -218,9 +261,12 @@ public class SyntaxParser {
             throw ArgEx;
         }
 
-        this.opStack.push(token);
-        this.bracketCount++;
-        this.lastToken = token;
+        opStack.push(token);
+        if (funcStack.size() > 0) {
+            opFuncMap.put(token, funcStack.peek());
+        }
+        bracketCount++;
+        lastToken = token;
     }
 
     /**
@@ -239,8 +285,13 @@ public class SyntaxParser {
         }
 
         SyntaxNode node = buildSyntaxNode(token);
-        this.queue.push(node);
-        this.lastToken = token;
+        queue.push(node);
+        if (!funcStack.isEmpty()) {
+            Token funcToken = funcStack.peek();
+            Stack<SyntaxNode> opStack = funcOperandsMap.get(funcToken);
+            opStack.push(node);
+        }
+        lastToken = token;
     }
 
     /**
@@ -274,23 +325,34 @@ public class SyntaxParser {
                     }
                 }
 
-                SyntaxNode node = buildSyntaxNode(opStack.pop());
-                queue.push(node);
+                handleTopOperator();
             }
             opStack.push(token);
+            if (funcStack.size() > 0) {
+                opFuncMap.put(token, funcStack.peek());
+            }
             lastToken = token;
         } else {
             if (token.getType() == TokenType.Minus) {
                 Token unaryToken = new Token(TokenType.UnaryNegative, "-");
                 opStack.push(unaryToken);
+                if (funcStack.size() > 0) {
+                    opFuncMap.put(unaryToken, funcStack.peek());
+                }
                 lastToken = unaryToken;
             } else if (token.getType() == TokenType.Plus) {
                 Token unaryToken = new Token(TokenType.UnaryPositive, "+");
                 opStack.push(unaryToken);
+                if (funcStack.size() > 0) {
+                    opFuncMap.put(unaryToken, funcStack.peek());
+                }
                 lastToken = unaryToken;
             } else if (token.getType() == TokenType.LogicalNot) {
                 Token unaryToken = new Token(TokenType.LogicalNot, "!");
                 opStack.push(unaryToken);
+                if (funcStack.size() > 0) {
+                    opFuncMap.put(unaryToken, funcStack.peek());
+                }
                 lastToken = unaryToken;
             } else {
                 throw new SyntaxParserException("An non-unary operator cannot go after an operator");
@@ -323,13 +385,12 @@ public class SyntaxParser {
                 opStack.pop();
                 break;
             } else {
-                SyntaxNode node = buildSyntaxNode(opStack.pop());
-                queue.push(node);
+                handleTopOperator();
             }
         }
         if ((opStack.size() > 0) && (opStack.peek().getType() == TokenType.Function)) {
-            SyntaxNode node = buildSyntaxNode(opStack.pop());
-            queue.push(node);
+            handleTopOperator();
+            funcStack.pop();
         }
         bracketCount--;
         lastToken = token;
@@ -337,15 +398,15 @@ public class SyntaxParser {
 
     private void parseToken(Token token) {
         switch (token.getType()) {
-            case Function:
-                parseFunction(token);
+            case Integer:
+            case Decimal:
+                parseNumber(token);
                 break;
             case Variable:
                 parseVariable(token);
                 break;
-            case Integer:
-            case Decimal:
-                parseNumber(token);
+            case Function:
+                parseFunction(token);
                 break;
             case LeftParen:
                 parseLeftParen(token);
@@ -373,6 +434,7 @@ public class SyntaxParser {
             case LogicalOr:
             case QuestionMark:
             case Colon:
+            case Dot:
                 parseOperator(token);
                 break;
             default:
@@ -397,11 +459,16 @@ public class SyntaxParser {
 
         SyntaxNode node = buildSyntaxNode(token);
         queue.push(node);
+        if (!funcStack.isEmpty()) {
+            Token funcToken = funcStack.peek();
+            Stack<SyntaxNode> opStack = funcOperandsMap.get(funcToken);
+            opStack.push(node);
+        }
         lastToken = token;
     }
 
 
-    public enum AssociativityType {
+    enum AssociativityType {
         Left, Right, None
     }
 }

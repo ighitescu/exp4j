@@ -32,15 +32,13 @@ public class LexerTest {
         }
     }
 
-    @Test(expected = LexerException.class)
+    @Test
     public void testBadNumberInput2() {
-        try {
-            Lexer lexer = new Lexer("123.");
-            lexer.take();
-        } catch (LexerException e) {
-            Assert.assertEquals(4, e.getPosition());
-            throw e;
-        }
+        List<Token> list = toList("2.");
+
+        assertSize(list, 2);
+        assertToken(list, 0, TokenType.Integer, "2");
+        assertToken(list, 1, TokenType.Dot, ".");
     }
 
 

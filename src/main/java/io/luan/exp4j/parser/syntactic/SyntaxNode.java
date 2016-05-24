@@ -17,10 +17,11 @@
 package io.luan.exp4j.parser.syntactic;
 
 import io.luan.exp4j.parser.lexical.Token;
-import io.luan.exp4j.parser.lexical.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.luan.exp4j.parser.syntactic.SyntaxParserUtil.getSyntaxType;
 
 public class SyntaxNode {
 
@@ -36,54 +37,11 @@ public class SyntaxNode {
         this.childNodes = new ArrayList<>();
     }
 
-    private static SyntaxNodeType getSyntaxType(TokenType tokenType) {
-        switch (tokenType) {
-            case Integer:
-            case Decimal:
-                return SyntaxNodeType.Number;
-            case Variable:
-                return SyntaxNodeType.Variable;
-            case Function:
-                return SyntaxNodeType.Function;
-            case Plus:
-                return SyntaxNodeType.BinaryAdd;
-            case Minus:
-                return SyntaxNodeType.BinarySubtract;
-            case Asterisk:
-                return SyntaxNodeType.BinaryMultiply;
-            case Slash:
-                return SyntaxNodeType.BinaryDivide;
-            case Caret:
-                return SyntaxNodeType.BinaryPower;
-            case UnaryNegative:
-                return SyntaxNodeType.UnaryNegative;
-            case UnaryPositive:
-                return SyntaxNodeType.UnaryPositive;
-            case GreaterThan:
-                return SyntaxNodeType.GreaterThan;
-            case GreaterThanOrEqual:
-                return SyntaxNodeType.GreaterThanOrEqual;
-            case LessThan:
-                return SyntaxNodeType.LessThan;
-            case LessThanOrEqual:
-                return SyntaxNodeType.LessThanOrEqual;
-            case Equate:
-                return SyntaxNodeType.Equal;
-            case NotEquate:
-                return SyntaxNodeType.NotEqual;
-            case LogicalNot:
-                return SyntaxNodeType.LogicalNot;
-            case LogicalAnd:
-                return SyntaxNodeType.LogicalAnd;
-            case LogicalOr:
-                return SyntaxNodeType.LogicalOr;
-            case QuestionMark:
-                return SyntaxNodeType.TernaryQuestion;
-            case Colon:
-                return SyntaxNodeType.TernaryColon;
+    public SyntaxNode get(int index) {
+        if (childNodes != null && index < childNodes.size()) {
+            return childNodes.get(index);
         }
-
-        throw new SyntaxParserException("Unsupported TokenType: " + tokenType);
+        return null;
     }
 
     public List<SyntaxNode> getChildNodes() {
