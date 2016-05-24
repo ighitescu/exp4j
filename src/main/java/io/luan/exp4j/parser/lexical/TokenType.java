@@ -23,10 +23,10 @@ public enum TokenType {
     Integer(TokenTypeType.Operand), // [0-9]+
     Decimal(TokenTypeType.Operand), // [0-9]+.[0-9]*([eE][+-]?[0-9]+)
 
-    Variable(TokenTypeType.Operand), // [a-zA-Z][a-zA-Z0-9]*{[a-zA-Z0-9_()}
-    Parameter(TokenTypeType.Operand), // @[a-zA-Z][a-zA-Z0-9]*
-    Constant(TokenTypeType.Operand), // #[a-zA-Z][a-zA-Z0-9]*
+    Variable(TokenTypeType.Operand), // [a-zA-Z][a-zA-Z0-9]*
 
+    Member(TokenTypeType.Operand), // \.[a-zA-Z][a-zA-Z0-9]*
+    Method(TokenTypeType.Operand), // \.[a-zA-Z][a-zA-Z0-9]* follow by (
     // TODO: Should this be operand?
     Function(TokenTypeType.Operand), // [a-zA-Z][a-zA-Z0-9]* but followed by (
 

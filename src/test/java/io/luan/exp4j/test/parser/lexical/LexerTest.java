@@ -43,16 +43,6 @@ public class LexerTest {
         }
     }
 
-    @Test(expected = LexerException.class)
-    public void testBadNumberInput3() {
-        try {
-            Lexer lexer = new Lexer(".a");
-            lexer.take();
-        } catch (LexerException e) {
-            Assert.assertEquals(1, e.getPosition());
-            throw e;
-        }
-    }
 
     @Test(expected = LexerException.class)
     public void testBadNumberInput4() {
@@ -63,6 +53,19 @@ public class LexerTest {
             Assert.assertEquals(2, e.getPosition());
             throw e;
         }
+    }
+
+    @Test
+    public void testFunc() {
+        List<Token> list = toList("a(b,c)");
+
+        assertSize(list, 6);
+        assertToken(list, 0, TokenType.Function, "a");
+        assertToken(list, 1, TokenType.LeftParen, "(");
+        assertToken(list, 2, TokenType.Variable, "b");
+        assertToken(list, 3, TokenType.Comma, ",");
+        assertToken(list, 4, TokenType.Variable, "c");
+        assertToken(list, 5, TokenType.RightParen, ")");
     }
 
     @Test(expected = LexerException.class)
@@ -151,6 +154,39 @@ public class LexerTest {
         assertToken(list, 2, TokenType.Asterisk, "*");
         assertToken(list, 3, TokenType.Slash, "/");
     }
+
+    @Test
+    public void testMember() {
+        List<Token> list = toList("a b.c d.e.f.g");
+
+        assertSize(list, 7);
+        assertToken(list, 0, TokenType.Variable, "a");
+        assertToken(list, 1, TokenType.Variable, "b");
+        assertToken(list, 2, TokenType.Member, ".c");
+        assertToken(list, 3, TokenType.Variable, "d");
+        assertToken(list, 4, TokenType.Member, ".e");
+        assertToken(list, 5, TokenType.Member, ".f");
+        assertToken(list, 6, TokenType.Member, ".g");
+    }
+
+    @Test
+    public void testMethod() {
+        List<Token> list = toList("a.b().c(d,e)");
+
+        assertSize(list, 10);
+        assertToken(list, 0, TokenType.Variable, "a");
+        assertToken(list, 1, TokenType.Method, ".b");
+        assertToken(list, 2, TokenType.LeftParen, "(");
+        assertToken(list, 3, TokenType.RightParen, ")");
+        assertToken(list, 4, TokenType.Method, ".c");
+        assertToken(list, 5, TokenType.LeftParen, "(");
+        assertToken(list, 6, TokenType.Variable, "d");
+        assertToken(list, 7, TokenType.Comma, ",");
+        assertToken(list, 8, TokenType.Variable, "e");
+        assertToken(list, 9, TokenType.RightParen, ")");
+    }
+
+
 
     @Test
     public void testPeekTake() {

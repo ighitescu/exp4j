@@ -200,10 +200,6 @@ public class ExpressionParser {
                 return buildPositive(node);
             case Variable:
                 return buildVariable(node);
-            case Parameter:
-                return buildParameter(node);
-            case Constant:
-                return buildConstant(node);
             case Number:
                 return buildNumber(node);
             case Function:

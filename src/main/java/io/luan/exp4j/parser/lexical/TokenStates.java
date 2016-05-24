@@ -21,19 +21,18 @@ class TokenStates {
     static final TokenState Start = TokenState.nonTerminal("Start");
     static final TokenState Error = TokenState.error("Error");
     static final TokenState Integer = TokenState.terminal("Integer", TokenType.Integer);
+    static final TokenState Dot = TokenState.nonTerminal("Dot");
     static final TokenState IntegerDot = TokenState.nonTerminal("IntegerDot");
     static final TokenState Decimal = TokenState.terminal("Decimal", TokenType.Decimal);
     static final TokenState DecimalExpPartial = TokenState.nonTerminal("DecimalExpPartial");
     static final TokenState DecimalExpPlusMinusPartial = TokenState.nonTerminal("DecimalExpPlusMinusPartial");
     static final TokenState DecimalExponent = TokenState.terminal("DecimalExponent", TokenType.Decimal);
+
     static final TokenState Variable = TokenState.terminal("Variable", TokenType.Variable);
-    static final TokenState VariableBracket = TokenState.nonTerminal("VariableBracket");
-    static final TokenState VariableFull = TokenState.terminal("VariableFull", TokenType.Variable);
-    static final TokenState ParameterStart = TokenState.nonTerminal("ParameterStart");
-    static final TokenState Parameter = TokenState.terminal("Parameter", TokenType.Parameter);
-    static final TokenState ConstantStart = TokenState.nonTerminal("ConstantStart");
-    static final TokenState Constant = TokenState.terminal("Constant", TokenType.Constant);
+    static final TokenState Member = TokenState.terminal("Member", TokenType.Member);
+    static final TokenState Method = TokenState.terminal("Method", TokenType.Method);
     static final TokenState Function = TokenState.terminal("Function", TokenType.Function);
+
     static final TokenState Plus = TokenState.terminal("Plus", TokenType.Plus);
     static final TokenState Minus = TokenState.terminal("Minus", TokenType.Minus);
     static final TokenState Asterisk = TokenState.terminal("Asterisk", TokenType.Asterisk);
@@ -66,7 +65,7 @@ class TokenStates {
         Start.addTransition(c -> Character.isDigit(c), TokenStates.Integer);
         Start.addTransition(c -> Character.isLetter(c), TokenStates.Variable);
         //Start.addTransition(c -> c == '_', TokenStates.Variable);	// Note: Do not allow initial underscore.
-        Start.addTransition(c -> c == '.', TokenStates.IntegerDot);
+        Start.addTransition(c -> c == '.', TokenStates.Dot);
         Start.addTransition(c -> c == '+', TokenStates.Plus);
         Start.addTransition(c -> c == '-', TokenStates.Minus);
         Start.addTransition(c -> c == '*', TokenStates.Asterisk);
@@ -77,8 +76,6 @@ class TokenStates {
         Start.addTransition(c -> c == ')', TokenStates.RightParen);
         Start.addTransition(c -> c == ',', TokenStates.Comma);
         Start.addTransition(c -> c == '=', TokenStates.Equal);
-        Start.addTransition(c -> c == '@', TokenStates.ParameterStart);    // Non terminal
-        Start.addTransition(c -> c == '#', TokenStates.ConstantStart);        // Non terminal
 
         Integer.addTransition(c -> Character.isDigit(c), TokenStates.Integer);
         Integer.addTransition(c -> c == '.', TokenStates.IntegerDot);
@@ -86,6 +83,10 @@ class TokenStates {
         Integer.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         IntegerDot.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
+        IntegerDot.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
+
+        Dot.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
+        Dot.addTransition(c->Character.isLetter(c), TokenStates.Member);
 
         Decimal.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
         Decimal.addTransition(c -> c == 'e' || c == 'E', TokenStates.DecimalExpPartial);
@@ -104,24 +105,9 @@ class TokenStates {
         Variable.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Variable);
         Variable.addTransition(c -> c == '_', TokenStates.Variable);
         Variable.addTransition(c -> c == '(', TokenStates.Function, false);    // Special Case: If ( is encountered, the previous token is a function call token. should NOT consume the next char.
-        Variable.addTransition(c -> c == '{', TokenStates.VariableBracket);
 
-        VariableBracket.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.VariableBracket);
-        VariableBracket.addTransition(c -> c == ',', TokenStates.VariableBracket);
-        VariableBracket.addTransition(c -> c == '(', TokenStates.VariableBracket);
-        VariableBracket.addTransition(c -> c == ')', TokenStates.VariableBracket);
-        VariableBracket.addTransition(c -> c == '}', TokenStates.VariableFull);
-
-
-        ParameterStart.addTransition(c -> Character.isLetter(c), TokenStates.Parameter);
-
-        Parameter.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Parameter);
-        Parameter.addTransition(c -> c == '_', TokenStates.Parameter);
-
-        ConstantStart.addTransition(c -> Character.isLetter(c), TokenStates.Constant);
-
-        Constant.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Constant);
-        Constant.addTransition(c -> c == '_', TokenStates.Constant);
+        Member.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Member);
+        Member.addTransition(c -> c == '(', TokenStates.Method, false);    // Special Case: If ( is encountered, the previous token is a function call token. should NOT consume the next char.
 
         Start.addTransition(c -> c == '>', TokenStates.GreaterThan);
         GreaterThan.addTransition(c -> c == '=', TokenStates.GreaterThanOrEqual);

@@ -30,10 +30,10 @@ public class MainTest {
     @Test
     public void evaluatesExpression() {
 
-        Expression exp = Expression.parse("3.3 + (x^2 + 3.2) * x +  #B + #B * 3");
+        Expression exp = Expression.parse("3.3 + (x^2 + 3.2) * x +  B + B * 3");
         Map<String, Object> input = new HashMap<String, Object>(10);
         input.put("x", 10);
-        input.put("#B", 2);
+        input.put("B", 2);
         System.out.println("-----" + Expression.variables(exp));
         System.out.println("-----" + Expression.constants(exp));
 

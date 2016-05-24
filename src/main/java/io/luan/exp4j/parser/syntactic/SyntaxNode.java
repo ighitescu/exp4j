@@ -43,10 +43,6 @@ public class SyntaxNode {
                 return SyntaxNodeType.Number;
             case Variable:
                 return SyntaxNodeType.Variable;
-            case Parameter:
-                return SyntaxNodeType.Parameter;
-            case Constant:
-                return SyntaxNodeType.Constant;
             case Function:
                 return SyntaxNodeType.Function;
             case Plus:

@@ -166,7 +166,7 @@ public class SyntaxParser {
     private SyntaxNode buildSyntaxNode(Token token) {
         SyntaxNode syntaxNode = new SyntaxNode(token);
         int operandCount = getOperandCount(syntaxNode);
-        Stack<SyntaxNode> stack = new Stack<SyntaxNode>();
+        Stack<SyntaxNode> stack = new Stack<>();
         for (int i = 0; i < operandCount; i++) {
             SyntaxNode node = this.queue.pop();
             stack.push(node);
@@ -213,8 +213,6 @@ public class SyntaxParser {
                 return 1;
             case Number:
             case Variable:
-            case Parameter:
-            case Constant:
                 return 0;
         }
         throw new SyntaxParserException("Unrecognized SyntaxNode type: " + node.getType());
@@ -275,13 +273,13 @@ public class SyntaxParser {
     }
 
     /**
-     * ID Token: Variable, Parameter, Constant
+     * Variable, Parameter, Constant
      * <p>
      * Cannot go after:
      * - Operand
      * - RightParen
      */
-    private void parseIdentifier(Token token) {
+    private void parseVariable(Token token) {
         if (lastToken.getType().isOperand()) {
             throw ArgEx;
         }
@@ -436,9 +434,7 @@ public class SyntaxParser {
                 parseFunction(token);
                 break;
             case Variable:
-            case Parameter:
-            case Constant:
-                parseIdentifier(token);
+                parseVariable(token);
                 break;
             case Integer:
             case Decimal:

@@ -20,8 +20,6 @@ public enum SyntaxNodeType {
     None,
     Number,
     Variable,
-    Parameter,
-    Constant,
     Function,
     UnaryNegative,
     UnaryPositive,
