@@ -25,8 +25,8 @@ public enum TokenType {
 
     Variable(TokenTypeType.Operand), // [a-zA-Z][a-zA-Z0-9]*
 
-    Member(TokenTypeType.Operand), // \.[a-zA-Z][a-zA-Z0-9]*
-    Method(TokenTypeType.Operand), // \.[a-zA-Z][a-zA-Z0-9]* follow by (
+    Dot(TokenTypeType.BinaryOperator), // '.'
+
     // TODO: Should this be operand?
     Function(TokenTypeType.Operand), // [a-zA-Z][a-zA-Z0-9]* but followed by (
 

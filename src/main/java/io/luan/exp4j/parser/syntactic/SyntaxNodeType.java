@@ -21,6 +21,8 @@ public enum SyntaxNodeType {
     Number,
     Variable,
     Function,
+    Member,
+    Method,
     UnaryNegative,
     UnaryPositive,
     BinaryAdd,

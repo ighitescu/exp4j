@@ -159,31 +159,38 @@ public class LexerTest {
     public void testMember() {
         List<Token> list = toList("a b.c d.e.f.g");
 
-        assertSize(list, 7);
+        assertSize(list, 11);
         assertToken(list, 0, TokenType.Variable, "a");
         assertToken(list, 1, TokenType.Variable, "b");
-        assertToken(list, 2, TokenType.Member, ".c");
-        assertToken(list, 3, TokenType.Variable, "d");
-        assertToken(list, 4, TokenType.Member, ".e");
-        assertToken(list, 5, TokenType.Member, ".f");
-        assertToken(list, 6, TokenType.Member, ".g");
+        assertToken(list, 2, TokenType.Dot, ".");
+        assertToken(list, 3, TokenType.Variable, "c");
+
+        assertToken(list, 4, TokenType.Variable, "d");
+        assertToken(list, 5, TokenType.Dot, ".");
+        assertToken(list, 6, TokenType.Variable, "e");
+        assertToken(list, 7, TokenType.Dot, ".");
+        assertToken(list, 8, TokenType.Variable, "f");
+        assertToken(list, 9, TokenType.Dot, ".");
+        assertToken(list, 10, TokenType.Variable, "g");
     }
 
     @Test
     public void testMethod() {
         List<Token> list = toList("a.b().c(d,e)");
 
-        assertSize(list, 10);
+        assertSize(list, 12);
         assertToken(list, 0, TokenType.Variable, "a");
-        assertToken(list, 1, TokenType.Method, ".b");
-        assertToken(list, 2, TokenType.LeftParen, "(");
-        assertToken(list, 3, TokenType.RightParen, ")");
-        assertToken(list, 4, TokenType.Method, ".c");
-        assertToken(list, 5, TokenType.LeftParen, "(");
-        assertToken(list, 6, TokenType.Variable, "d");
-        assertToken(list, 7, TokenType.Comma, ",");
-        assertToken(list, 8, TokenType.Variable, "e");
-        assertToken(list, 9, TokenType.RightParen, ")");
+        assertToken(list, 1, TokenType.Dot, ".");
+        assertToken(list, 2, TokenType.Function, "b");
+        assertToken(list, 3, TokenType.LeftParen, "(");
+        assertToken(list, 4, TokenType.RightParen, ")");
+        assertToken(list, 5, TokenType.Dot, ".");
+        assertToken(list, 6, TokenType.Function, "c");
+        assertToken(list, 7, TokenType.LeftParen, "(");
+        assertToken(list, 8, TokenType.Variable, "d");
+        assertToken(list, 9, TokenType.Comma, ",");
+        assertToken(list, 10, TokenType.Variable, "e");
+        assertToken(list, 11, TokenType.RightParen, ")");
     }
 
 

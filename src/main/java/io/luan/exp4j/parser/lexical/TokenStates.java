@@ -21,7 +21,7 @@ class TokenStates {
     static final TokenState Start = TokenState.nonTerminal("Start");
     static final TokenState Error = TokenState.error("Error");
     static final TokenState Integer = TokenState.terminal("Integer", TokenType.Integer);
-    static final TokenState Dot = TokenState.nonTerminal("Dot");
+    static final TokenState Dot = TokenState.terminal("Dot", TokenType.Dot);
     static final TokenState IntegerDot = TokenState.nonTerminal("IntegerDot");
     static final TokenState Decimal = TokenState.terminal("Decimal", TokenType.Decimal);
     static final TokenState DecimalExpPartial = TokenState.nonTerminal("DecimalExpPartial");
@@ -29,8 +29,6 @@ class TokenStates {
     static final TokenState DecimalExponent = TokenState.terminal("DecimalExponent", TokenType.Decimal);
 
     static final TokenState Variable = TokenState.terminal("Variable", TokenType.Variable);
-    static final TokenState Member = TokenState.terminal("Member", TokenType.Member);
-    static final TokenState Method = TokenState.terminal("Method", TokenType.Method);
     static final TokenState Function = TokenState.terminal("Function", TokenType.Function);
 
     static final TokenState Plus = TokenState.terminal("Plus", TokenType.Plus);
@@ -86,7 +84,6 @@ class TokenStates {
         IntegerDot.addFatal(c -> Character.isLetter(c) && c != 'e' && c != 'E'); // Fatal
 
         Dot.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
-        Dot.addTransition(c->Character.isLetter(c), TokenStates.Member);
 
         Decimal.addTransition(c -> Character.isDigit(c), TokenStates.Decimal);
         Decimal.addTransition(c -> c == 'e' || c == 'E', TokenStates.DecimalExpPartial);
@@ -105,9 +102,6 @@ class TokenStates {
         Variable.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Variable);
         Variable.addTransition(c -> c == '_', TokenStates.Variable);
         Variable.addTransition(c -> c == '(', TokenStates.Function, false);    // Special Case: If ( is encountered, the previous token is a function call token. should NOT consume the next char.
-
-        Member.addTransition(c -> Character.isLetterOrDigit(c), TokenStates.Member);
-        Member.addTransition(c -> c == '(', TokenStates.Method, false);    // Special Case: If ( is encountered, the previous token is a function call token. should NOT consume the next char.
 
         Start.addTransition(c -> c == '>', TokenStates.GreaterThan);
         GreaterThan.addTransition(c -> c == '=', TokenStates.GreaterThanOrEqual);

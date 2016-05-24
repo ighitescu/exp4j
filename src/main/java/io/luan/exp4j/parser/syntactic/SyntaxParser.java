@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import static io.luan.exp4j.parser.syntactic.SyntaxParserUtil.getAssociativity;
+import static io.luan.exp4j.parser.syntactic.SyntaxParserUtil.getPrecedence;
+
 /**
  * Parses a string into an syntax tree
  * Each parser is one-use only.
@@ -57,88 +60,12 @@ public class SyntaxParser {
         this.lastToken = Token.EMPTY;
     }
 
-    private static AssociativityType getAssociativity(TokenType tokenType) {
-        switch (tokenType) {
-            case Asterisk:
-            case Slash:
-            case Plus:
-            case Minus:
-            case GreaterThan:
-            case GreaterThanOrEqual:
-            case LessThan:
-            case LessThanOrEqual:
-            case Equate:
-            case NotEquate:
-            case LogicalAnd:
-            case LogicalOr:
-                return AssociativityType.Left;
-            case UnaryNegative:
-            case UnaryPositive:
-            case Caret:
-            case LogicalNot:
-            case BitwiseNot:
-            case QuestionMark:
-            case Colon:
-                return AssociativityType.Right;
-            default:
-                return AssociativityType.None;
-        }
-    }
-
-    /**
-     * 越小越优先
-     */
-    private static int getPrecedence(TokenType tokenType) {
-        switch (tokenType) {
-            case Function:
-                return 1;
-            case UnaryNegative:
-            case UnaryPositive:
-            case LogicalNot:
-            case BitwiseNot:
-                return 2;
-            case Caret: // Power
-                return 3;
-            case Asterisk: // Multiply
-            case Slash: // Divide
-            case Percent: // Mod
-                return 4;
-            case Plus: // Add
-            case Minus: // Subtract
-                return 5;
-            case GreaterThan:
-            case GreaterThanOrEqual:
-            case LessThan:
-            case LessThanOrEqual:
-                return 6;
-            case Equate: // ==
-            case NotEquate: // !=
-                return 7;
-            case BitwiseAnd: // &
-                return 8;
-            case BitwiseOr: // |
-                return 9;
-            case LogicalAnd: // &&
-                return 10;
-            case LogicalOr: // ||
-                return 11;
-
-            case QuestionMark:// conditional ? :
-            case Colon:// conditional ? :
-                return 15;
-
-            case Equal: // '='
-                return 20;
-            default:
-                return 99;
-        }
-    }
 
     public SyntaxNode parse() {
 
         Token token = lexer.take();
         while (token != null) {
-            if (Config.DEBUG) {
+            if (Config.DEBUG_PARSER) {
                 System.out.println("[TOKEN] " + token);
             }
             parseToken(token);
@@ -270,26 +197,6 @@ public class SyntaxParser {
         this.funcOperands.add(0);
 
         this.lastToken = token;
-    }
-
-    /**
-     * Variable, Parameter, Constant
-     * <p>
-     * Cannot go after:
-     * - Operand
-     * - RightParen
-     */
-    private void parseVariable(Token token) {
-        if (lastToken.getType().isOperand()) {
-            throw ArgEx;
-        }
-        if (lastToken.getType() == TokenType.RightParen) {
-            throw ArgEx;
-        }
-
-        SyntaxNode node = buildSyntaxNode(token);
-        queue.push(node);
-        lastToken = token;
     }
 
     /**
@@ -473,8 +380,28 @@ public class SyntaxParser {
         }
     }
 
+    /**
+     * Variable, Parameter, Constant
+     * <p>
+     * Cannot go after:
+     * - Operand
+     * - RightParen
+     */
+    private void parseVariable(Token token) {
+        if (lastToken.getType().isOperand()) {
+            throw ArgEx;
+        }
+        if (lastToken.getType() == TokenType.RightParen) {
+            throw ArgEx;
+        }
 
-    private enum AssociativityType {
+        SyntaxNode node = buildSyntaxNode(token);
+        queue.push(node);
+        lastToken = token;
+    }
+
+
+    public enum AssociativityType {
         Left, Right, None
     }
 }
