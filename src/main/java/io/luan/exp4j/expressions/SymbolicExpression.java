@@ -16,6 +16,8 @@
 
 package io.luan.exp4j.expressions;
 
+import io.luan.exp4j.Expression;
+
 /**
  * Interface for all symbolics:
  * - Variable
@@ -24,5 +26,5 @@ package io.luan.exp4j.expressions;
  *
  * Note: Function is not yet considered symbolic.
  */
-public interface SymbolicExpression {
+public interface SymbolicExpression extends Expression {
 }

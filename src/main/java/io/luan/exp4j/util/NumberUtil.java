@@ -601,7 +601,7 @@ public class NumberUtil {
             // do nothing
         }
 
-        throw new NumberFormatException();
+        return null;
     }
 
     public static Number power(Number left, Number right) {

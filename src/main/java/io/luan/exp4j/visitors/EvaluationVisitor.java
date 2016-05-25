@@ -26,11 +26,16 @@ import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
+import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.type.ObjectExpression;
+import io.luan.exp4j.expressions.util.ExpressionUtil;
 import io.luan.exp4j.util.NumberUtil;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -125,6 +130,24 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
 
         Expression result = expression.getFunc().apply(paramExps);
         return result;
+    }
+
+    @Override
+    public Expression visitMember(MemberExpression expression) {
+        Expression owner = expression.getOwner().accept(this);
+        ObjectExpression ownerExp = (ObjectExpression)owner;
+        Object ownerObj = ownerExp.getObject();
+        try {
+            Field field = ownerObj.getClass().getField(expression.getMemberName());
+            Object result = field.get(ownerObj);
+            return ExpressionUtil.objToExpression(result);
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return super.visitMember(expression);
     }
 
     @Override
@@ -234,29 +257,9 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
     public Expression visitVariable(VariableExpression expression) {
         Object varValue = values.get(expression.getName());
         if (varValue == null) {
-            return NumberExpression.One;
+            throw new IllegalArgumentException("Input cannot be null");
         }
 
-        if (varValue instanceof Integer) {
-            return new NumberExpression((Integer) varValue);
-        }
-        if (varValue instanceof Long) {
-            return new NumberExpression((Long) varValue);
-        }
-        if (varValue instanceof BigInteger) {
-            return new NumberExpression((BigInteger) varValue);
-        }
-        if (varValue instanceof BigDecimal) {
-            return new NumberExpression((BigDecimal) varValue);
-        }
-        if (varValue instanceof Double) {
-            return new NumberExpression(BigDecimal.valueOf((Double) varValue));
-        }
-        if (varValue instanceof String) {
-            Number number = NumberUtil.parse((String) varValue);
-            return new NumberExpression(number);
-        }
-
-        return super.visitVariable(expression);
+        return ExpressionUtil.objToExpression(varValue);
     }
 }

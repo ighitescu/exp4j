@@ -27,6 +27,7 @@ import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
+import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
@@ -133,6 +134,14 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
         builder.append("^");
         visit(expression.getExponent(), !expression.getExponent().isSimpleOperand());
         return super.visitPower(expression);
+    }
+
+    @Override
+    public Expression visitMember(MemberExpression expression) {
+        visit(expression.getOwner(), false);
+        builder.append(".");
+        builder.append(expression.getMemberName());
+        return super.visitMember(expression);
     }
 
     /// <summary>

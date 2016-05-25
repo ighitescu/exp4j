@@ -31,6 +31,8 @@ public enum ExpressionType {
 
     Method(41),
 
+    Object(80),
+
     Sum(101),
     Product(102),
     Power(103),
@@ -42,7 +44,7 @@ public enum ExpressionType {
     LogicalOr(2002),
     LogicalNot(2003),
 
-    Comparison(3001);
+    Comparison(3001) ;
 
     private int value;
 

@@ -14,39 +14,51 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.symbolic;
+package io.luan.exp4j.expressions.type;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.SymbolicExpression;
+import io.luan.exp4j.expressions.BooleanExpression;
 import io.luan.exp4j.expressions.base.BaseExpression;
 
-public class MemberExpression extends BaseExpression implements SymbolicExpression {
+/**
+ * Base of all value-type expressions:
+ *  - NumberExpression
+ *  - Boolean
+ */
+public class ObjectExpression extends BaseExpression {
 
-    private String memberName;
-    private SymbolicExpression owner;
+    private Object obj;
 
-    public MemberExpression(SymbolicExpression owner, String memberName) {
-        this.owner = owner;
-        this.memberName = memberName;
+    public ObjectExpression(Object obj) {
+        this.obj = obj;
     }
 
-    @Override
     public Expression accept(ExpressionVisitor visitor) {
-        return visitor.visitMember(this);
-    }
-
-    public String getMemberName() {
-        return memberName;
-    }
-
-    public SymbolicExpression getOwner() {
-        return owner;
+        return visitor.visitObject(this);
     }
 
     @Override
-    public ExpressionType getType() {
-        return ExpressionType.Member;
+    public boolean equals(Expression other) {
+        return other.getType() == ExpressionType.Object && obj.equals(((ObjectExpression) other).obj);
     }
+
+    public Object getObject() {
+        return obj;
+    }
+
+    public int getSize() {
+        return 0;
+    }
+
+    public ExpressionType getType() {
+        return ExpressionType.Object;
+    }
+
+    @Override
+    public int hashCode() {
+        return obj != null ? obj.hashCode() : 0;
+    }
+
 }

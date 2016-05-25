@@ -16,6 +16,7 @@
 
 package io.luan.exp4j;
 
+import io.luan.exp4j.expressions.SymbolicExpression;
 import io.luan.exp4j.expressions.arithmetic.PowerExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
@@ -30,6 +31,7 @@ import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.type.ObjectExpression;
 
 public interface ExpressionVisitor {
 
@@ -55,6 +57,8 @@ public interface ExpressionVisitor {
 
     Expression visitNumber(NumberExpression expression);
 
+    Expression visitObject(ObjectExpression expression);
+
     Expression visitPower(PowerExpression expression);
 
     Expression visitProduct(ProductExpression expression);
@@ -62,4 +66,6 @@ public interface ExpressionVisitor {
     Expression visitSum(SumExpression expression);
 
     Expression visitVariable(VariableExpression expression);
+
+    Expression visitSymbolic(SymbolicExpression expression);
 }

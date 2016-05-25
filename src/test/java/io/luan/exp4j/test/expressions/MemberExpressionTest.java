@@ -34,8 +34,27 @@ public class MemberExpressionTest {
         VariableExpression xVar = (VariableExpression) Expression.variable("x");
         MemberExpression member = new MemberExpression(xVar, "xxx");
 
+        System.out.println(member);
+
         Map<String, Object> input = new HashMap<>();
+        input.put("x", new TestMember() );
         Expression result = member.evaluate(input);
         System.out.println(result);
+        System.out.println(result.getClass());
+    }
+
+    @Test
+    public void testString() {
+        VariableExpression xVar = (VariableExpression) Expression.variable("x");
+
+        Map<String, Object> input = new HashMap<>();
+        input.put("x", 0.1 );
+        Expression result = xVar.evaluate(input);
+        System.out.println(result);
+        System.out.println(result.getClass());
+    }
+
+    public class TestMember {
+       public int xxx = 12;
     }
 }
