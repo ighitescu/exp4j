@@ -19,22 +19,39 @@ package io.luan.exp4j.expressions.symbolic;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.base.BaseExpression;
 import io.luan.exp4j.expressions.SymbolicExpression;
+import io.luan.exp4j.expressions.base.BaseExpression;
 
 public class MethodExpression extends BaseExpression implements SymbolicExpression {
 
     private String methodName;
     private SymbolicExpression owner;
+    private Expression[] params;
 
-    public MethodExpression(SymbolicExpression owner, String methodName) {
+    public MethodExpression(SymbolicExpression owner, String methodName, Expression[] params) {
         this.owner = owner;
         this.methodName = methodName;
+        this.params = params;
+        if (params == null) {
+            this.params = new Expression[0];
+        }
     }
 
     @Override
     public Expression accept(ExpressionVisitor visitor) {
         return visitor.visitMethod(this);
+    }
+
+    public String getName() {
+        return methodName;
+    }
+
+    public SymbolicExpression getOwner() {
+        return owner;
+    }
+
+    public Expression[] getParameters() {
+        return params;
     }
 
     @Override

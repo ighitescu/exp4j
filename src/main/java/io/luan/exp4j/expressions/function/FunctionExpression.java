@@ -32,9 +32,6 @@ public class FunctionExpression extends BaseExpression {
 
     public FunctionExpression(String name, Expression[] parameters,
                               Function<NumericExpression[], NumericExpression> func) {
-        if (parameters.length == 0) {
-            throw new IllegalArgumentException();
-        }
         this.name = name;
         this.funcParams = parameters;
         this.func = func;

@@ -18,28 +18,32 @@ package io.luan.exp4j.test.parser;
 
 
 import io.luan.exp4j.Expression;
+import io.luan.exp4j.ExpressionType;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.parser.ExpressionParser;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ExpressionParserTest {
 
     @Test
-    public void testA() {
-        ExpressionParser parser = new ExpressionParser("-a");
+    public void testMember() {
+        ExpressionParser parser = new ExpressionParser("a.b");
         Expression exp = parser.parse();
+
+        Assert.assertEquals(ExpressionType.Member, exp.getType());
         System.out.println(exp);
+    }
 
-        ExpressionParser parser2 = new ExpressionParser("-123");
-        Expression exp2 = parser2.parse();
-        System.out.println(exp2);
+    @Test
+    public void testMethod() {
+        ExpressionParser parser = new ExpressionParser("a.b(c,d)");
+        Expression exp = parser.parse();
 
-
-        ExpressionParser parser3 = new ExpressionParser("abc + -23");
-        Expression exp3 = parser3.parse();
-        System.out.println(exp3);
-
-        ExpressionParser parser4 = new ExpressionParser("abc + +23");
-        Expression exp4 = parser4.parse();
-        System.out.println(exp4);
+        System.out.println(exp);
+        Assert.assertEquals(ExpressionType.Method, exp.getType());
+        MethodExpression mExp = (MethodExpression) exp;
+        Expression[] params = mExp.getParameters();
+        Assert.assertEquals(2, params.length);
     }
 }

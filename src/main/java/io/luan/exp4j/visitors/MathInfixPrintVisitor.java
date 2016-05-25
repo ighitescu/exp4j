@@ -28,6 +28,7 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
@@ -122,6 +123,30 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
         return super.visitLogicalNot(expression);
     }
 
+    @Override
+    public Expression visitMember(MemberExpression expression) {
+        visit(expression.getOwner(), false);
+        builder.append(".");
+        builder.append(expression.getName());
+        return super.visitMember(expression);
+    }
+
+    @Override
+    public Expression visitMethod(MethodExpression expression) {
+        visit(expression.getOwner(), false);
+        builder.append(".");
+        builder.append(expression.getName());
+        builder.append("(");
+        for (int i = 0; i < expression.getParameters().length; i++) {
+            if (i > 0) {
+                builder.append(",");
+            }
+            visit(expression.getParameters()[i]);
+        }
+        builder.append(")");
+        return super.visitMethod(expression);
+    }
+
     public Expression visitNumber(NumberExpression expression) {
         Number number = expression.getNumber();
         String formatted = NumberFormatter.format(number);
@@ -134,14 +159,6 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
         builder.append("^");
         visit(expression.getExponent(), !expression.getExponent().isSimpleOperand());
         return super.visitPower(expression);
-    }
-
-    @Override
-    public Expression visitMember(MemberExpression expression) {
-        visit(expression.getOwner(), false);
-        builder.append(".");
-        builder.append(expression.getMemberName());
-        return super.visitMember(expression);
     }
 
     /// <summary>

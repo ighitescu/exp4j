@@ -37,7 +37,7 @@ public class MemberExpression extends BaseExpression implements SymbolicExpressi
         return visitor.visitMember(this);
     }
 
-    public String getMemberName() {
+    public String getName() {
         return memberName;
     }
 

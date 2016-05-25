@@ -18,8 +18,10 @@ package io.luan.exp4j.parser;
 
 import io.luan.exp4j.Config;
 import io.luan.exp4j.Expression;
+import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.BooleanExpression;
 import io.luan.exp4j.expressions.NumericExpression;
+import io.luan.exp4j.expressions.SymbolicExpression;
 import io.luan.exp4j.expressions.arithmetic.PowerExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
@@ -29,6 +31,8 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.logical.LogicalOrExpression;
+import io.luan.exp4j.expressions.symbolic.MemberExpression;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 import io.luan.exp4j.parser.syntactic.SyntaxNode;
@@ -135,10 +139,33 @@ public class ExpressionParser {
                 return buildLogicalOr(node);
             case TernaryQuestion:
                 return buildTernary(node);
+            case Dot:
+                return buildDot(node);
             case TernaryColon:
                 throw new SyntaxParserException("Ternary Colon must go after a Ternary QuestionMark");
         }
         throw new SyntaxParserException("Cannot parse node type: " + node.getType());
+    }
+
+    private Expression buildDot(SyntaxNode node) {
+        Expression ownerNode = buildNode(node.get(0));
+        Expression rightNode = buildNode(node.get(1));
+
+        SymbolicExpression ownerExp = (SymbolicExpression) ownerNode;
+
+        if (rightNode.getType() == ExpressionType.Variable) {
+            String memberName = ((VariableExpression) rightNode).getName();
+            return new MemberExpression(ownerExp, memberName);
+        }
+
+        if (rightNode.getType() == ExpressionType.Function) {
+            FunctionExpression funcExp = (FunctionExpression) rightNode;
+            String methodName = funcExp.getName();
+            Expression[] params = funcExp.getFuncParams();
+            return new MethodExpression(ownerExp, methodName, params);
+        }
+
+        throw new ExpressionParserException("Unrecognizable Token");
     }
 
     public Expression buildNumber(SyntaxNode node) {
@@ -203,7 +230,7 @@ public class ExpressionParser {
 
     public Expression parse() {
         SyntaxNode syntaxRoot = parser.parse();
-        if (Config.DEBUG) {
+        if (Config.DEBUG_PARSER) {
             System.out.println(syntaxRoot);
         }
         return buildNode(syntaxRoot).simplify();

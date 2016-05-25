@@ -32,12 +32,8 @@ import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 import io.luan.exp4j.expressions.type.ObjectExpression;
 import io.luan.exp4j.expressions.util.ExpressionUtil;
-import io.luan.exp4j.util.NumberUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,7 +134,7 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
         ObjectExpression ownerExp = (ObjectExpression)owner;
         Object ownerObj = ownerExp.getObject();
         try {
-            Field field = ownerObj.getClass().getField(expression.getMemberName());
+            Field field = ownerObj.getClass().getField(expression.getName());
             Object result = field.get(ownerObj);
             return ExpressionUtil.objToExpression(result);
 
