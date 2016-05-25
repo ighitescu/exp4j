@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions;
+package io.luan.exp4j.expressions.base;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.visitors.EvaluationVisitor;
 import io.luan.exp4j.visitors.MathInfixPrintVisitor;
@@ -28,16 +26,21 @@ import io.luan.exp4j.visitors.SimplificationVisitor;
 import io.luan.exp4j.visitors.SubstitutionVisitor;
 
 import java.util.Map;
-import java.util.Set;
 
 public abstract class BaseExpression implements Expression {
-    private Set<ParameterExpression> parameters;
-    private Set<VariableExpression> variables;
-    private Set<ConstantExpression> constants;
+
+    protected BaseExpression() {
+        // empty
+    }
 
     @Override
     public Expression accept(ExpressionVisitor visitor) {
         return visitor.visitExpression(this);
+    }
+
+    @Override
+    public boolean equals(Expression other) {
+        return this == other;
     }
 
     @Override
@@ -47,8 +50,14 @@ public abstract class BaseExpression implements Expression {
     }
 
     @Override
+    public int getSize() {
+        return 0;
+    }
+
+    @Override
     public boolean isNumeric() {
-        return getType() == ExpressionType.Number || getType() == ExpressionType.Rational
+        return getType() == ExpressionType.Number
+                || getType() == ExpressionType.Rational
                 || getType() == ExpressionType.Complex;
     }
 
@@ -58,16 +67,17 @@ public abstract class BaseExpression implements Expression {
      */
     @Override
     public boolean isSimpleOperand() {
-        return isNumeric() || isSymbolic() || getType() == ExpressionType.Function
+        return isNumeric() || isSymbolic()
+                || getType() == ExpressionType.Function
                 || getType() == ExpressionType.LogicalNot;
     }
 
     @Override
     public boolean isSymbolic() {
-        return getType() == ExpressionType.Variable || getType() == ExpressionType.Parameter
-                || getType() == ExpressionType.Constant;
+        return getType() == ExpressionType.Variable
+                || getType() == ExpressionType.Member
+                || getType() == ExpressionType.Method;
     }
-
 
     @Override
     public Expression simplify() {
@@ -75,13 +85,30 @@ public abstract class BaseExpression implements Expression {
         return accept(simpVisitor);
     }
 
+    @Override
     public Expression substitute(String variable, Expression substitute) {
         return substitute(new VariableExpression(variable), substitute);
     }
 
+    @Override
     public Expression substitute(Expression subExp, Expression substitute) {
         ExpressionVisitor visitor = new SubstitutionVisitor(subExp, substitute);
         return accept(visitor).simplify();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Expression)) {
+            return false;
+        }
+        Expression other = (Expression) obj;
+        return equals(other);
     }
 
     @Override
@@ -90,6 +117,4 @@ public abstract class BaseExpression implements Expression {
         accept(prettyVisitor);
         return prettyVisitor.getText();
     }
-
-
 }

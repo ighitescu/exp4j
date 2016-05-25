@@ -29,14 +29,12 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.logical.LogicalOrExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
-import io.luan.exp4j.parser.syntactic.SyntaxParserException;
 import io.luan.exp4j.parser.syntactic.SyntaxNode;
 import io.luan.exp4j.parser.syntactic.SyntaxNodeType;
 import io.luan.exp4j.parser.syntactic.SyntaxParser;
+import io.luan.exp4j.parser.syntactic.SyntaxParserException;
 import io.luan.exp4j.util.NumberUtil;
 import io.luan.exp4j.visitors.EvaluationVisitor;
 
@@ -49,59 +47,19 @@ public class ExpressionParser {
         parser = new SyntaxParser(expression);
     }
 
-    /// <summary>
-    /// An AddNode is converted to two nodes into two expressions with weight =
-    /// 1
-    /// </summary>
+    /**
+     * An AddNode is converted to two nodes into two expressions with weight = 1
+     */
     public Expression buildAdd(SyntaxNode node) {
-        Expression[] oprands = new Expression[]{buildNode(node.getChildNodes().get(0)),
-                buildNode(node.getChildNodes().get(1))};
-        NumericExpression[] coefs = new NumericExpression[]{NumberExpression.One, NumberExpression.One};
-        Expression sumExp = new SumExpression(oprands, coefs);
-        return sumExp;
-    }
-
-    private Expression buildComparison(SyntaxNode node) {
-        Expression left = buildNode(node.getChildNodes().get(0));
-        Expression right = buildNode(node.getChildNodes().get(1));
-        ComparisonExpression.ComparisonOperator operator;
-
-        switch (node.getType()) {
-            case GreaterThan:
-                operator = ComparisonExpression.ComparisonOperator.GreaterThan;
-                break;
-            case GreaterThanOrEqual:
-                operator = ComparisonExpression.ComparisonOperator.GreaterThanOrEqual;
-                break;
-            case LessThan:
-                operator = ComparisonExpression.ComparisonOperator.LessThan;
-                break;
-            case LessThanOrEqual:
-                operator = ComparisonExpression.ComparisonOperator.LessThanOrEqual;
-                break;
-            case Equal:
-                operator = ComparisonExpression.ComparisonOperator.Equal;
-                break;
-            case NotEqual:
-                operator = ComparisonExpression.ComparisonOperator.NotEqual;
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-        return new ComparisonExpression(left, right, operator);
-    }
-
-    public Expression buildConstant(SyntaxNode node) {
-        return new ConstantExpression(node.getToken().getText());
+        Expression[] operands = new Expression[] { buildNode(node.get(0)), buildNode(node.get(1)) };
+        NumericExpression[] coefs = new NumericExpression[] { NumberExpression.One, NumberExpression.One };
+        return new SumExpression(operands, coefs);
     }
 
     public Expression buildDivide(SyntaxNode node) {
-        Expression[] oprands = new Expression[]{buildNode(node.getChildNodes().get(0)),
-                buildNode(node.getChildNodes().get(1))};
-        NumericExpression[] exponents = new NumericExpression[]{NumberExpression.One, NumberExpression.MinusOne};
-        Expression prodExp = new ProductExpression(oprands, exponents);
-        return prodExp;
+        Expression[] operands = new Expression[] { buildNode(node.get(0)), buildNode(node.get(1)) };
+        NumericExpression[] exponents = new NumericExpression[] { NumberExpression.One, NumberExpression.MinusOne };
+        return new ProductExpression(operands, exponents);
     }
 
     public Expression buildFunction(SyntaxNode node) {
@@ -121,65 +79,23 @@ public class ExpressionParser {
         // return result;
         // }
 
-        // BUG: how to deal with external functions?
+        // TODO: how to deal with external functions?
         return new FunctionExpression(name, paramExps.toArray(new Expression[0]), null);
-    }
-
-    private Expression buildLogicalAnd(SyntaxNode node) {
-        Expression leftNode = buildNode(node.getChildNodes().get(0));
-        Expression rightNode = buildNode(node.getChildNodes().get(1));
-        if (leftNode instanceof BooleanExpression) {
-            BooleanExpression left = (BooleanExpression) leftNode;
-            if (rightNode instanceof BooleanExpression) {
-                BooleanExpression right = (BooleanExpression) rightNode;
-
-                BooleanExpression[] operands = new BooleanExpression[]{left, right};
-                return new LogicalAndExpression(operands);
-            }
-        }
-        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
-    }
-
-    private Expression buildLogicalNot(SyntaxNode node) {
-        Expression expression = buildNode(node.getChildNodes().get(0));
-        if (expression instanceof BooleanExpression) {
-            return new LogicalNotExpression((BooleanExpression) expression);
-        }
-        throw new ExpressionParserException("Cannot negate a non-boolean expression");
-    }
-
-    private Expression buildLogicalOr(SyntaxNode node) {
-        Expression leftNode = buildNode(node.getChildNodes().get(0));
-        Expression rightNode = buildNode(node.getChildNodes().get(1));
-        if (leftNode instanceof BooleanExpression) {
-            BooleanExpression left = (BooleanExpression) leftNode;
-            if (rightNode instanceof BooleanExpression) {
-                BooleanExpression right = (BooleanExpression) rightNode;
-
-                BooleanExpression[] operands = new BooleanExpression[]{left, right};
-                return new LogicalOrExpression(operands);
-            }
-        }
-        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
     }
 
     /**
      * A MultiplyNode is converted to Product Expression with two nodes weight = 1
      */
     public Expression buildMultiply(SyntaxNode node) {
-        Expression[] operands = new Expression[]{buildNode(node.getChildNodes().get(0)), buildNode(node.getChildNodes().get(1))};
-        NumericExpression[] exponents = new NumericExpression[]{NumberExpression.One, NumberExpression.One};
+        Expression[] operands = new Expression[] { buildNode(node.getChildNodes().get(0)), buildNode(node.getChildNodes().get(1)) };
+        NumericExpression[] exponents = new NumericExpression[] { NumberExpression.One, NumberExpression.One };
         return new ProductExpression(operands, exponents);
     }
 
     public Expression buildNegation(SyntaxNode node) {
-        Expression[] operands = new Expression[]{buildNode(node.getChildNodes().get(0))};
-        NumericExpression[] coefs = new NumericExpression[]{NumberExpression.MinusOne};
+        Expression[] operands = new Expression[] { buildNode(node.getChildNodes().get(0)) };
+        NumericExpression[] coefs = new NumericExpression[] { NumberExpression.MinusOne };
         return new SumExpression(operands, coefs);
-    }
-
-    public Expression buildPositive(SyntaxNode node) {
-        return buildNode(node.getChildNodes().get(0));
     }
 
     public Expression buildNode(SyntaxNode node) {
@@ -231,8 +147,8 @@ public class ExpressionParser {
         return new NumberExpression(number);
     }
 
-    public Expression buildParameter(SyntaxNode node) {
-        return new ParameterExpression(node.getToken().getText(), "", "");
+    public Expression buildPositive(SyntaxNode node) {
+        return buildNode(node.getChildNodes().get(0));
     }
 
     public Expression buildPower(SyntaxNode node) {
@@ -246,8 +162,8 @@ public class ExpressionParser {
 
         if (eval instanceof NumericExpression) {
             NumericExpression evaluatedRight = (NumericExpression) eval;
-            Expression[] oprands = new Expression[]{leftNode};
-            NumericExpression[] exponents = new NumericExpression[]{evaluatedRight};
+            Expression[] oprands = new Expression[] { leftNode };
+            NumericExpression[] exponents = new NumericExpression[] { evaluatedRight };
             Expression prodExp = new ProductExpression(oprands, exponents);
             return prodExp;
         }
@@ -259,8 +175,8 @@ public class ExpressionParser {
      * An SubtractNode is converted to two nodes with weight = 1 and -1
      */
     public Expression buildSubtract(SyntaxNode node) {
-        Expression[] operands = new Expression[]{buildNode(node.getChildNodes().get(0)), buildNode(node.getChildNodes().get(1))};
-        NumericExpression[] coefs = new NumericExpression[]{NumberExpression.One, NumberExpression.MinusOne};
+        Expression[] operands = new Expression[] { buildNode(node.getChildNodes().get(0)), buildNode(node.getChildNodes().get(1)) };
+        NumericExpression[] coefs = new NumericExpression[] { NumberExpression.One, NumberExpression.MinusOne };
         return new SumExpression(operands, coefs);
     }
 
@@ -291,5 +207,74 @@ public class ExpressionParser {
             System.out.println(syntaxRoot);
         }
         return buildNode(syntaxRoot).simplify();
+    }
+
+    private Expression buildComparison(SyntaxNode node) {
+        Expression left = buildNode(node.getChildNodes().get(0));
+        Expression right = buildNode(node.getChildNodes().get(1));
+        ComparisonExpression.ComparisonOperator operator;
+
+        switch (node.getType()) {
+            case GreaterThan:
+                operator = ComparisonExpression.ComparisonOperator.GreaterThan;
+                break;
+            case GreaterThanOrEqual:
+                operator = ComparisonExpression.ComparisonOperator.GreaterThanOrEqual;
+                break;
+            case LessThan:
+                operator = ComparisonExpression.ComparisonOperator.LessThan;
+                break;
+            case LessThanOrEqual:
+                operator = ComparisonExpression.ComparisonOperator.LessThanOrEqual;
+                break;
+            case Equal:
+                operator = ComparisonExpression.ComparisonOperator.Equal;
+                break;
+            case NotEqual:
+                operator = ComparisonExpression.ComparisonOperator.NotEqual;
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        return new ComparisonExpression(left, right, operator);
+    }
+
+    private Expression buildLogicalAnd(SyntaxNode node) {
+        Expression leftNode = buildNode(node.getChildNodes().get(0));
+        Expression rightNode = buildNode(node.getChildNodes().get(1));
+        if (leftNode instanceof BooleanExpression) {
+            BooleanExpression left = (BooleanExpression) leftNode;
+            if (rightNode instanceof BooleanExpression) {
+                BooleanExpression right = (BooleanExpression) rightNode;
+
+                BooleanExpression[] operands = new BooleanExpression[] { left, right };
+                return new LogicalAndExpression(operands);
+            }
+        }
+        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
+    }
+
+    private Expression buildLogicalNot(SyntaxNode node) {
+        Expression expression = buildNode(node.getChildNodes().get(0));
+        if (expression instanceof BooleanExpression) {
+            return new LogicalNotExpression((BooleanExpression) expression);
+        }
+        throw new ExpressionParserException("Cannot negate a non-boolean expression");
+    }
+
+    private Expression buildLogicalOr(SyntaxNode node) {
+        Expression leftNode = buildNode(node.getChildNodes().get(0));
+        Expression rightNode = buildNode(node.getChildNodes().get(1));
+        if (leftNode instanceof BooleanExpression) {
+            BooleanExpression left = (BooleanExpression) leftNode;
+            if (rightNode instanceof BooleanExpression) {
+                BooleanExpression right = (BooleanExpression) rightNode;
+
+                BooleanExpression[] operands = new BooleanExpression[] { left, right };
+                return new LogicalOrExpression(operands);
+            }
+        }
+        throw new SyntaxParserException("All operands must be subtype of BooleanExpression");
     }
 }

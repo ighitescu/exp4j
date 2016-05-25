@@ -26,8 +26,6 @@ import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
@@ -97,6 +95,39 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
     }
 
     @Override
+    public Expression visitConditional(ConditionalExpression expression) {
+
+        Expression cond = expression.getCondition().accept(this);
+        if (cond instanceof BooleanValueExpression) {
+            BooleanValueExpression condBool = (BooleanValueExpression) cond;
+            if (condBool.getBooleanValue()) {
+                return expression.getTrueExpression().accept(this);
+            } else {
+                return expression.getFalseExpression().accept(this);
+            }
+        }
+
+        return super.visitConditional(expression);
+    }
+
+    public Expression visitFunction(FunctionExpression expression) {
+        NumericExpression[] paramExps = new NumericExpression[expression.getFuncParams().length];
+
+        for (int i = 0; i < expression.getFuncParams().length; i++) {
+            Expression param = expression.getFuncParams()[i].accept(this);
+            if (param instanceof NumericExpression) {
+                paramExps[i] = (NumericExpression) param;
+            } else {
+                // sub expression cannot be evaluated, return self.
+                return super.visitFunction(expression);
+            }
+        }
+
+        Expression result = expression.getFunc().apply(paramExps);
+        return result;
+    }
+
+    @Override
     public Expression visitLogicalAnd(LogicalAndExpression expression) {
         for (int i = 0; i < expression.getOperands().length; i++) {
             Expression exp = expression.getOperands()[i].accept(this);
@@ -124,109 +155,6 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
             }
         }
         return super.visitLogicalNot(expression);
-    }
-
-    @Override
-    public Expression visitConditional(ConditionalExpression expression) {
-
-        Expression cond = expression.getCondition().accept(this);
-        if (cond instanceof BooleanValueExpression) {
-            BooleanValueExpression condBool = (BooleanValueExpression) cond;
-            if (condBool.getBooleanValue()) {
-                return expression.getTrueExpression().accept(this);
-            } else {
-                return expression.getFalseExpression().accept(this);
-            }
-        }
-
-        return super.visitConditional(expression);
-    }
-
-    @Override
-    public Expression visitConstant(ConstantExpression expression) {
-        Object varValue = values.get(expression.getName());
-        if (varValue == null) {
-            return NumberExpression.One;
-        }
-
-        if (varValue instanceof Integer) {
-            return new NumberExpression((Integer) varValue);
-        }
-        if (varValue instanceof BigDecimal) {
-            return new NumberExpression((BigDecimal) varValue);
-        }
-
-        if (varValue instanceof String) {
-            try {
-                int intVal = Integer.parseInt((String) varValue);
-                return new NumberExpression(intVal);
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-
-            try {
-                BigDecimal decVal = new BigDecimal((String) varValue);
-                return new NumberExpression(decVal);
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-
-            throw new NumberFormatException();
-        }
-
-        return super.visitConstant(expression);
-    }
-
-    public Expression visitFunction(FunctionExpression expression) {
-        NumericExpression[] paramExps = new NumericExpression[expression.getFuncParams().length];
-
-        for (int i = 0; i < expression.getFuncParams().length; i++) {
-            Expression param = expression.getFuncParams()[i].accept(this);
-            if (param instanceof NumericExpression) {
-                paramExps[i] = (NumericExpression) param;
-            } else {
-                // sub expression cannot be evaluated, return self.
-                return super.visitFunction(expression);
-            }
-        }
-
-        Expression result = expression.getFunc().apply(paramExps);
-        return result;
-    }
-
-    @Override
-    public Expression visitParameter(ParameterExpression expression) {
-        Object varValue = values.get(expression.getName());
-        if (varValue == null) {
-            return NumberExpression.One;
-        }
-
-        if (varValue instanceof Integer) {
-            return new NumberExpression((Integer) varValue);
-        }
-        if (varValue instanceof BigDecimal) {
-            return new NumberExpression((BigDecimal) varValue);
-        }
-
-        if (varValue instanceof String) {
-            try {
-                int intVal = Integer.parseInt((String) varValue);
-                return new NumberExpression(intVal);
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-
-            try {
-                BigDecimal decVal = new BigDecimal((String) varValue);
-                return new NumberExpression(decVal);
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-
-            throw new NumberFormatException();
-        }
-
-        return super.visitParameter(expression);
     }
 
     @Override

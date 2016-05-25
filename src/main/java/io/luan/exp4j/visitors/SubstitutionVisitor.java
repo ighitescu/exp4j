@@ -21,8 +21,6 @@ import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 
@@ -46,16 +44,6 @@ public class SubstitutionVisitor extends BaseExpressionVisitor {
         return target;
     }
 
-    public Expression visitConstant(ConstantExpression expression) {
-        if (target.getType() == ExpressionType.Constant) {
-            ConstantExpression varTarget = (ConstantExpression) target;
-            if (varTarget.getName().equals(expression.getName())) {
-                return substitute;
-            }
-        }
-        return super.visitConstant(expression);
-    }
-
     @Override
     public Expression visitNumber(NumberExpression expression) {
         if (target.getType() == ExpressionType.Number) {
@@ -65,16 +53,6 @@ public class SubstitutionVisitor extends BaseExpressionVisitor {
             }
         }
         return super.visitNumber(expression);
-    }
-
-    public Expression visitParameter(ParameterExpression expression) {
-        if (target.getType() == ExpressionType.Parameter) {
-            ParameterExpression varTarget = (ParameterExpression) target;
-            if (varTarget.getName().equals(expression.getName())) {
-                return substitute;
-            }
-        }
-        return super.visitParameter(expression);
     }
 
     public Expression visitProduct(ProductExpression expression) {

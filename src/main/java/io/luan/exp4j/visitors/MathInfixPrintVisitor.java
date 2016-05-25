@@ -27,8 +27,6 @@ import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
@@ -46,18 +44,10 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
         return builder.toString();
     }
 
-    private void visit(Expression expression) {
-        visit(expression, false);
-    }
-
-    private void visit(Expression expression, boolean bracketed) {
-        if (bracketed) {
-            builder.append("(");
-        }
-        expression.accept(this);
-        if (bracketed) {
-            builder.append(")");
-        }
+    @Override
+    public Expression visitBooleanValue(BooleanValueExpression expression) {
+        builder.append(expression.getBooleanValue() ? "true" : "false");
+        return super.visitBooleanValue(expression);
     }
 
     @Override
@@ -90,6 +80,29 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
     }
 
     @Override
+    public Expression visitConditional(ConditionalExpression expression) {
+        visit(expression.getCondition(), !expression.getCondition().isSimpleOperand());
+        builder.append(" ? ");
+        visit(expression.getTrueExpression(), !expression.getTrueExpression().isSimpleOperand());
+        builder.append(" : ");
+        visit(expression.getFalseExpression(), !expression.getFalseExpression().isSimpleOperand());
+        return super.visitConditional(expression);
+    }
+
+    public Expression visitFunction(FunctionExpression expression) {
+        builder.append(expression.getName() + "(");
+        for (int i = 0; i < expression.getFuncParams().length; i++) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            visit(expression.getFuncParams()[i]);
+        }
+        builder.append(")");
+
+        return super.visitFunction(expression);
+    }
+
+    @Override
     public Expression visitLogicalAnd(LogicalAndExpression expression) {
         visit(expression.getOperands()[0], !expression.getOperands()[0].isSimpleOperand());
 
@@ -108,50 +121,11 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
         return super.visitLogicalNot(expression);
     }
 
-    @Override
-    public Expression visitBooleanValue(BooleanValueExpression expression) {
-        builder.append(expression.getBooleanValue() ? "true" : "false");
-        return super.visitBooleanValue(expression);
-    }
-
-    @Override
-    public Expression visitConditional(ConditionalExpression expression) {
-        visit(expression.getCondition(), !expression.getCondition().isSimpleOperand());
-        builder.append(" ? ");
-        visit(expression.getTrueExpression(), !expression.getTrueExpression().isSimpleOperand());
-        builder.append(" : ");
-        visit(expression.getFalseExpression(), !expression.getFalseExpression().isSimpleOperand());
-        return super.visitConditional(expression);
-    }
-
-    public Expression visitConstant(ConstantExpression expression) {
-        builder.append(expression.getName());
-        return super.visitConstant(expression);
-    }
-
     public Expression visitNumber(NumberExpression expression) {
         Number number = expression.getNumber();
         String formatted = NumberFormatter.format(number);
         builder.append(formatted);
         return super.visitNumber(expression);
-    }
-
-    public Expression visitFunction(FunctionExpression expression) {
-        builder.append(expression.getName() + "(");
-        for (int i = 0; i < expression.getFuncParams().length; i++) {
-            if (i > 0) {
-                builder.append(", ");
-            }
-            visit(expression.getFuncParams()[i]);
-        }
-        builder.append(")");
-
-        return super.visitFunction(expression);
-    }
-
-    public Expression visitParameter(ParameterExpression expression) {
-        builder.append(expression.getName() + "[" + expression.getMethod() + "," + expression.getFormula() + "]");
-        return super.visitParameter(expression);
     }
 
     public Expression visitPower(PowerExpression expression) {
@@ -246,5 +220,19 @@ public class MathInfixPrintVisitor extends BaseExpressionVisitor {
     public Expression visitVariable(VariableExpression expression) {
         builder.append(expression.getName());
         return super.visitVariable(expression);
+    }
+
+    private void visit(Expression expression) {
+        visit(expression, false);
+    }
+
+    private void visit(Expression expression, boolean bracketed) {
+        if (bracketed) {
+            builder.append("(");
+        }
+        expression.accept(this);
+        if (bracketed) {
+            builder.append(")");
+        }
     }
 }

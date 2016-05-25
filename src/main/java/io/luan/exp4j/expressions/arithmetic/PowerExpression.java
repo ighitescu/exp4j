@@ -19,7 +19,7 @@ package io.luan.exp4j.expressions.arithmetic;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.BaseExpression;
+import io.luan.exp4j.expressions.base.BaseExpression;
 
 public class PowerExpression extends BaseExpression {
 

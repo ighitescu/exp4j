@@ -21,8 +21,6 @@ import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 import io.luan.exp4j.visitors.BaseExpressionVisitor;
@@ -45,14 +43,6 @@ public class DifferentiationVisitor extends BaseExpressionVisitor {
         return variable;
     }
 
-    public Expression visitConstant(ConstantExpression expression) {
-        return NumberExpression.Zero;
-    }
-
-    public Expression visitNumber(NumberExpression expression) {
-        return NumberExpression.Zero;
-    }
-
     public Expression visitFunction(FunctionExpression expression) {
         // if (this.sinRule.CanApply(expression, Variable)) {
         // return this.sinRule.Apply(expression, Variable);
@@ -63,7 +53,7 @@ public class DifferentiationVisitor extends BaseExpressionVisitor {
         throw new RuntimeException();
     }
 
-    public Expression visitParameter(ParameterExpression expression) {
+    public Expression visitNumber(NumberExpression expression) {
         return NumberExpression.Zero;
     }
 
@@ -73,14 +63,14 @@ public class DifferentiationVisitor extends BaseExpressionVisitor {
             NumericExpression exponent = expression.getExponents()[0];
 
             Expression diffExp = onlyChild.accept(this);
-            Expression[] newOperands = new Expression[]{onlyChild, diffExp};
-            NumericExpression[] newExponents = new NumericExpression[]{exponent.subtract(NumberExpression.One),
-                    NumberExpression.One};
+            Expression[] newOperands = new Expression[] { onlyChild, diffExp };
+            NumericExpression[] newExponents = new NumericExpression[] { exponent.subtract(NumberExpression.One),
+                    NumberExpression.One };
 
             ProductExpression newProdExp = new ProductExpression(newOperands, newExponents);
 
-            SumExpression sumExp = new SumExpression(new Expression[]{newProdExp},
-                    new NumericExpression[]{exponent});
+            SumExpression sumExp = new SumExpression(new Expression[] { newProdExp },
+                    new NumericExpression[] { exponent });
             return sumExp;
         } else {
             ArrayList<Expression> sumOperands = new ArrayList<Expression>();
@@ -95,8 +85,8 @@ public class DifferentiationVisitor extends BaseExpressionVisitor {
                         // f(x)^n) IF Exponents[i] != 1
                         if (!expression.getExponents()[i].equate(NumberExpression.One)) {
                             ProductExpression tempExp = new ProductExpression(
-                                    new Expression[]{expression.getOperands()[i]},
-                                    new NumericExpression[]{expression.getExponents()[i]});
+                                    new Expression[] { expression.getOperands()[i] },
+                                    new NumericExpression[] { expression.getExponents()[i] });
                             prodOperands.add(tempExp.accept(this));
                         } else {
                             prodOperands.add(expression.getOperands()[i].accept(this));

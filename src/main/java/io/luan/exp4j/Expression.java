@@ -19,13 +19,9 @@ package io.luan.exp4j;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 import io.luan.exp4j.parser.ExpressionParser;
-import io.luan.exp4j.visitors.ConstantVisitor;
-import io.luan.exp4j.visitors.ParameterVisitor;
 import io.luan.exp4j.visitors.VariableVisitor;
 import io.luan.exp4j.visitors.algebra.DifferentiationVisitor;
 
@@ -41,18 +37,8 @@ public interface Expression {
             throw new IllegalArgumentException("op1 and op2 cannot be null");
         }
 
-        Expression[] operands = new Expression[]{op1, op2};
+        Expression[] operands = new Expression[] { op1, op2 };
         return new SumExpression(operands).simplify();
-    }
-
-    static Expression constant(String name) {
-        return new ConstantExpression(name);
-    }
-
-    static Set<ConstantExpression> constants(Expression expression) {
-        ConstantVisitor visitor = new ConstantVisitor();
-        expression.accept(visitor);
-        return visitor.getConstants();
     }
 
     /**
@@ -68,8 +54,8 @@ public interface Expression {
             throw new IllegalArgumentException("op1 and op2 cannot be null");
         }
 
-        Expression[] operands = new Expression[]{op1, op2};
-        NumericExpression[] exponents = new NumericExpression[]{NumberExpression.One, NumberExpression.MinusOne};
+        Expression[] operands = new Expression[] { op1, op2 };
+        NumericExpression[] exponents = new NumericExpression[] { NumberExpression.One, NumberExpression.MinusOne };
         return new ProductExpression(operands, exponents).simplify();
     }
 
@@ -78,25 +64,15 @@ public interface Expression {
             throw new IllegalArgumentException("op1 and op2 cannot be null");
         }
 
-        Expression[] operands = new Expression[]{op1, op2};
+        Expression[] operands = new Expression[] { op1, op2 };
         return new ProductExpression(operands).simplify();
     }
 
     static Expression negate(Expression expression) {
-        Expression[] operands = new Expression[]{expression};
-        NumericExpression[] coefs = new NumericExpression[]{NumberExpression.MinusOne};
+        Expression[] operands = new Expression[] { expression };
+        NumericExpression[] coefs = new NumericExpression[] { NumberExpression.MinusOne };
         Expression sumNode = new SumExpression(operands, coefs);
         return sumNode.simplify();
-    }
-
-    static Expression parameter(String name, String formula, String lookup) {
-        return new ParameterExpression(lookup, name, formula);
-    }
-
-    static Set<ParameterExpression> parameters(Expression expression) {
-        ParameterVisitor visitor = new ParameterVisitor();
-        expression.accept(visitor);
-        return visitor.getParameters();
     }
 
     static Expression parse(String expression) {
@@ -105,8 +81,8 @@ public interface Expression {
     }
 
     static Expression power(Expression op1, int power) {
-        Expression[] operands = new Expression[]{op1};
-        NumericExpression[] coefs = new NumericExpression[]{new NumberExpression(power)};
+        Expression[] operands = new Expression[] { op1 };
+        NumericExpression[] coefs = new NumericExpression[] { new NumberExpression(power) };
         return new ProductExpression(operands, coefs).simplify();
     }
 

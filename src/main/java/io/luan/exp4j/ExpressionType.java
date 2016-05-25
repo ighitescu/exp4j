@@ -24,10 +24,12 @@ public enum ExpressionType {
     Number(9),
 
     Variable(11),
-    Parameter(12),
-    Constant(13),
 
     Function(21),
+
+    Member(31),
+
+    Method(41),
 
     Sum(101),
     Product(102),

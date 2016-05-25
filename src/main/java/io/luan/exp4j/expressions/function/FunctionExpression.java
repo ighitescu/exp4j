@@ -20,7 +20,7 @@ import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
 import io.luan.exp4j.expressions.NumericExpression;
-import io.luan.exp4j.expressions.BaseExpression;
+import io.luan.exp4j.expressions.base.BaseExpression;
 
 import java.util.function.Function;
 

@@ -35,7 +35,6 @@ public class MainTest {
         input.put("x", 10);
         input.put("B", 2);
         System.out.println("-----" + Expression.variables(exp));
-        System.out.println("-----" + Expression.constants(exp));
 
         Expression result = exp.evaluate(input);
 

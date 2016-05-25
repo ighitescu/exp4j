@@ -27,8 +27,8 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.logical.LogicalOrExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
+import io.luan.exp4j.expressions.symbolic.MemberExpression;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
@@ -36,7 +36,27 @@ import io.luan.exp4j.expressions.type.NumberExpression;
 public class BaseExpressionVisitor implements ExpressionVisitor {
 
     @Override
+    public Expression visitBooleanValue(BooleanValueExpression expression) {
+        return expression;
+    }
+
+    @Override
     public Expression visitComparison(ComparisonExpression expression) {
+        return expression;
+    }
+
+    @Override
+    public Expression visitConditional(ConditionalExpression expression) {
+        return expression;
+    }
+
+    @Override
+    public Expression visitExpression(Expression expression) {
+        return expression;
+    }
+
+    @Override
+    public Expression visitFunction(FunctionExpression expression) {
         return expression;
     }
 
@@ -56,37 +76,17 @@ public class BaseExpressionVisitor implements ExpressionVisitor {
     }
 
     @Override
-    public Expression visitBooleanValue(BooleanValueExpression expression) {
+    public Expression visitMember(MemberExpression expression) {
         return expression;
     }
 
     @Override
-    public Expression visitConditional(ConditionalExpression expression) {
-        return expression;
-    }
-
-    @Override
-    public Expression visitConstant(ConstantExpression expression) {
+    public Expression visitMethod(MethodExpression expression) {
         return expression;
     }
 
     @Override
     public Expression visitNumber(NumberExpression expression) {
-        return expression;
-    }
-
-    @Override
-    public Expression visitExpression(Expression expression) {
-        return expression;
-    }
-
-    @Override
-    public Expression visitFunction(FunctionExpression expression) {
-        return expression;
-    }
-
-    @Override
-    public Expression visitParameter(ParameterExpression expression) {
         return expression;
     }
 

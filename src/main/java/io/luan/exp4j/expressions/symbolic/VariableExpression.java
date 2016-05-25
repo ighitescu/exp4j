@@ -19,9 +19,10 @@ package io.luan.exp4j.expressions.symbolic;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.BaseExpression;
+import io.luan.exp4j.expressions.SymbolicExpression;
+import io.luan.exp4j.expressions.base.BaseExpression;
 
-public class VariableExpression extends BaseExpression {
+public class VariableExpression extends BaseExpression implements SymbolicExpression {
 
     private String name;
 
@@ -29,24 +30,12 @@ public class VariableExpression extends BaseExpression {
         this.name = name;
     }
 
+    @Override
     public Expression accept(ExpressionVisitor visitor) {
         return visitor.visitVariable(this);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof Expression)) {
-            return false;
-        }
-        Expression other = (Expression) obj;
-        return equals(other);
-    }
+
 
     /// <summary>
     /// Two variable expressions are equal if they are both variable expressions

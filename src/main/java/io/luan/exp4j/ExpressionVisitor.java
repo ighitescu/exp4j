@@ -25,15 +25,23 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.logical.LogicalOrExpression;
-import io.luan.exp4j.expressions.symbolic.ConstantExpression;
-import io.luan.exp4j.expressions.symbolic.ParameterExpression;
+import io.luan.exp4j.expressions.symbolic.MemberExpression;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.type.BooleanValueExpression;
 import io.luan.exp4j.expressions.type.NumberExpression;
 
 public interface ExpressionVisitor {
 
+    Expression visitBooleanValue(BooleanValueExpression expression);
+
     Expression visitComparison(ComparisonExpression expression);
+
+    Expression visitConditional(ConditionalExpression expression);
+
+    Expression visitExpression(Expression expression);
+
+    Expression visitFunction(FunctionExpression expression);
 
     Expression visitLogicalAnd(LogicalAndExpression expression);
 
@@ -41,19 +49,11 @@ public interface ExpressionVisitor {
 
     Expression visitLogicalOr(LogicalOrExpression expression);
 
-    Expression visitBooleanValue(BooleanValueExpression expression);
+    Expression visitMember(MemberExpression expression);
 
-    Expression visitConditional(ConditionalExpression expression);
-
-    Expression visitConstant(ConstantExpression expression);
+    Expression visitMethod(MethodExpression expression);
 
     Expression visitNumber(NumberExpression expression);
-
-    Expression visitExpression(Expression expression);
-
-    Expression visitFunction(FunctionExpression expression);
-
-    Expression visitParameter(ParameterExpression expression);
 
     Expression visitPower(PowerExpression expression);
 

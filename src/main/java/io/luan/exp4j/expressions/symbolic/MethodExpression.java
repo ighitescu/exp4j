@@ -14,49 +14,31 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.type;
+package io.luan.exp4j.expressions.symbolic;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
 import io.luan.exp4j.expressions.base.BaseExpression;
-import io.luan.exp4j.expressions.BooleanExpression;
+import io.luan.exp4j.expressions.SymbolicExpression;
 
-public class BooleanValueExpression extends BaseExpression implements BooleanExpression {
+public class MethodExpression extends BaseExpression implements SymbolicExpression {
 
-    public static final BooleanValueExpression True = new BooleanValueExpression(true);
-    public static final BooleanValueExpression False = new BooleanValueExpression(false);
+    private String methodName;
+    private SymbolicExpression owner;
 
-    private boolean boolValue;
-
-    public BooleanValueExpression(boolean value) {
-        boolValue = value;
+    public MethodExpression(SymbolicExpression owner, String methodName) {
+        this.owner = owner;
+        this.methodName = methodName;
     }
 
+    @Override
     public Expression accept(ExpressionVisitor visitor) {
-        return visitor.visitBooleanValue(this);
+        return visitor.visitMethod(this);
     }
 
     @Override
-    public boolean equals(Expression other) {
-        return false;
-    }
-
-    public boolean getBooleanValue() {
-        return boolValue;
-    }
-
-    public int getSize() {
-        return 1;
-    }
-
     public ExpressionType getType() {
-        return ExpressionType.BooleanValue;
+        return ExpressionType.Method;
     }
-
-    @Override
-    public int hashCode() {
-        return boolValue ? 1 : 0;
-    }
-
 }

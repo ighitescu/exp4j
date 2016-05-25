@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.object;
+package io.luan.exp4j.expressions;
 
 /**
- * Created by Miao on 5/23/2016.
+ * Interface for all symbolics:
+ * - Variable
+ * - Member
+ * - Method
+ *
+ * Note: Function is not yet considered symbolic.
  */
-public class ObjectExpression {
+public interface SymbolicExpression {
 }
