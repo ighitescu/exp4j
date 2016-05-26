@@ -19,7 +19,7 @@ package io.luan.exp4j.visitors.simplification;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 
 /// <summary>
 /// Applies to PROD node, single child with exponent == 1

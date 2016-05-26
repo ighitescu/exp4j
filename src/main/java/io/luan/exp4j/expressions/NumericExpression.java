@@ -19,7 +19,7 @@ package io.luan.exp4j.expressions;
 import io.luan.exp4j.Expression;
 
 /**
- * Base interface of the Four type type expressions:
+ * Base interface of the Four value value expressions:
  * Number Expression (Can be Long or BigDecimal)
  * Fraction Expression TODO: A Fraction have both top and bottom as integers
  * Complex Expression TODO: Complex Expression

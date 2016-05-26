@@ -22,7 +22,7 @@ import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.visitors.BaseExpressionVisitor;
 
 import java.util.ArrayList;

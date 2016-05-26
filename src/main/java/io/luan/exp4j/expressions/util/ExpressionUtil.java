@@ -1,9 +1,9 @@
 package io.luan.exp4j.expressions.util;
 
 import io.luan.exp4j.Expression;
-import io.luan.exp4j.expressions.type.BooleanValueExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
-import io.luan.exp4j.expressions.type.ObjectExpression;
+import io.luan.exp4j.expressions.value.BooleanValueExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
+import io.luan.exp4j.expressions.value.ObjectExpression;
 import io.luan.exp4j.util.NumberUtil;
 
 import java.math.BigDecimal;
@@ -12,11 +12,11 @@ import java.math.BigInteger;
 public class ExpressionUtil {
 
     /**
-     * Convert object into expression based on object's type
+     * Convert object into expression based on object's value
      *   - Numbers are converted into number related expressions
      *   - Boolean is converted into BooleanValueExpression
      *   - String is first try to convert into a number
-     *     - if doesn't work, then use String type
+     *     - if doesn't work, then use String value
      *   - If all above fails use ObjectExpression
      */
     public static Expression objToExpression(Object obj) {

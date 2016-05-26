@@ -14,46 +14,33 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.type;
+package io.luan.exp4j.expressions.value;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.BooleanExpression;
 import io.luan.exp4j.expressions.base.BaseExpression;
 
 /**
  * Base of all value-type expressions:
- *  - NumberExpression
- *  - Boolean
+ * - NumberExpression
+ * - BooleanValueExpression
+ * - ObjectExpression
+ * - StringExpression // TODO: add this?
  */
-public class ObjectExpression extends BaseExpression {
+public abstract class ValueExpression extends BaseExpression {
 
     private Object obj;
 
-    public ObjectExpression(Object obj) {
+    public ValueExpression(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
         this.obj = obj;
-    }
-
-    public Expression accept(ExpressionVisitor visitor) {
-        return visitor.visitObject(this);
-    }
-
-    @Override
-    public boolean equals(Expression other) {
-        return other.getType() == ExpressionType.Object && obj.equals(((ObjectExpression) other).obj);
     }
 
     public Object getObject() {
         return obj;
-    }
-
-    public int getSize() {
-        return 0;
-    }
-
-    public ExpressionType getType() {
-        return ExpressionType.Object;
     }
 
     @Override

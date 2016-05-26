@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.type;
+package io.luan.exp4j.expressions.value;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
 import io.luan.exp4j.expressions.NumericExpression;
-import io.luan.exp4j.expressions.base.BaseExpression;
 import io.luan.exp4j.util.NumberUtil;
 
 /**
@@ -28,19 +27,15 @@ import io.luan.exp4j.util.NumberUtil;
  * <p>
  * - Valid for Integer, Long, BigDecimal, BigInteger
  */
-public class NumberExpression extends BaseExpression implements NumericExpression {
+public class NumberExpression extends ValueExpression implements NumericExpression {
 
     public static final NumberExpression One = new NumberExpression(1);
     public static final NumberExpression MinusOne = new NumberExpression(-1);
     public static final NumberExpression Zero = new NumberExpression(0);
     public static final NumberExpression Ten = new NumberExpression(10);
 
-    private final Number number;
-
     public NumberExpression(Number number) {
-        if (number == null)
-            throw new IllegalArgumentException("number is null!");
-        this.number = number;
+        super(number);
     }
 
     @Override
@@ -51,7 +46,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public NumericExpression add(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            Number result = NumberUtil.add(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            Number result = NumberUtil.add(getNumber(), otherExp.getNumber());
             return new NumberExpression(result);
         }
         throw new UnsupportedOperationException();
@@ -60,7 +56,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public int compareTo(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            return NumberUtil.compare(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            return NumberUtil.compare(getNumber(), otherExp.getNumber());
         }
         throw new UnsupportedOperationException();
     }
@@ -68,7 +65,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public NumericExpression divide(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            Number result = NumberUtil.divide(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            Number result = NumberUtil.divide(getNumber(), otherExp.getNumber());
             return new NumberExpression(result);
         }
         throw new UnsupportedOperationException();
@@ -77,7 +75,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public boolean equate(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            return NumberUtil.equate(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            return NumberUtil.equate(getNumber(), otherExp.getNumber());
         }
         throw new UnsupportedOperationException();
     }
@@ -85,7 +84,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public NumericExpression multiply(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            Number result = NumberUtil.multiply(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            Number result = NumberUtil.multiply(getNumber(),otherExp.getNumber());
             return new NumberExpression(result);
         }
         throw new UnsupportedOperationException();
@@ -93,14 +93,15 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
 
     @Override
     public NumericExpression negate() {
-        Number result = NumberUtil.negate(number);
+        Number result = NumberUtil.negate(getNumber());
         return new NumberExpression(result);
     }
 
     @Override
     public NumericExpression power(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            Number result = NumberUtil.power(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            Number result = NumberUtil.power(getNumber(), otherExp.getNumber());
             return new NumberExpression(result);
         }
         throw new UnsupportedOperationException();
@@ -109,7 +110,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public NumericExpression subtract(NumericExpression other) {
         if (other instanceof NumberExpression) {
-            Number result = NumberUtil.subtract(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            Number result = NumberUtil.subtract(getNumber(), otherExp.getNumber());
             return new NumberExpression(result);
         }
         throw new UnsupportedOperationException();
@@ -118,7 +120,8 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     @Override
     public boolean equals(Expression other) {
         if (other != null && other instanceof NumberExpression) {
-            return NumberUtil.equate(number, ((NumberExpression) other).number);
+            NumberExpression otherExp = (NumberExpression) other;
+            return NumberUtil.equate(getNumber(), otherExp.getNumber());
         }
         return false;
     }
@@ -134,6 +137,6 @@ public class NumberExpression extends BaseExpression implements NumericExpressio
     }
 
     public Number getNumber() {
-        return number;
+        return (Number)getObject();
     }
 }

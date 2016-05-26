@@ -34,7 +34,7 @@ import io.luan.exp4j.expressions.logical.LogicalOrExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.parser.syntactic.SyntaxNode;
 import io.luan.exp4j.parser.syntactic.SyntaxNodeType;
 import io.luan.exp4j.parser.syntactic.SyntaxParser;
@@ -144,7 +144,7 @@ public class ExpressionParser {
             case TernaryColon:
                 throw new SyntaxParserException("Ternary Colon must go after a Ternary QuestionMark");
         }
-        throw new SyntaxParserException("Cannot parse node type: " + node.getType());
+        throw new SyntaxParserException("Cannot parse node value: " + node.getType());
     }
 
     private Expression buildDot(SyntaxNode node) {

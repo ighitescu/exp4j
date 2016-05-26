@@ -20,7 +20,7 @@ import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 
 import java.util.ArrayList;
 
@@ -28,8 +28,8 @@ import java.util.ArrayList;
 /// Numeric Sum Rule (Applies to Sum)
 /// 	All numeric operands should be consolidated to a single numeric node
 /// 	Stop if there is one or zero numeric operands, and if exist, the coef is ONE
-/// 	If the consolidated type is zero, remove this node.
-/// If the sum has no other terms other than a type, return the type node.
+/// 	If the consolidated value is zero, remove this node.
+/// If the sum has no other terms other than a value, return the value node.
 /// </summary>
 public class NumericSumSimplificationRule implements SimplificationRule {
 

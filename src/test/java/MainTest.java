@@ -18,7 +18,7 @@ import io.luan.exp4j.Expression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.comparison.ComparisonExpression;
 import io.luan.exp4j.expressions.conditional.ConditionalExpression;
-import io.luan.exp4j.expressions.type.BooleanValueExpression;
+import io.luan.exp4j.expressions.value.BooleanValueExpression;
 import io.luan.exp4j.expressions.NumericExpression;
 import org.junit.Assert;
 import org.junit.Test;

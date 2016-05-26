@@ -29,9 +29,10 @@ import io.luan.exp4j.expressions.logical.LogicalOrExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.expressions.type.BooleanValueExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
-import io.luan.exp4j.expressions.type.ObjectExpression;
+import io.luan.exp4j.expressions.value.BooleanValueExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
+import io.luan.exp4j.expressions.value.ObjectExpression;
+import io.luan.exp4j.expressions.value.ValueExpression;
 
 public interface ExpressionVisitor {
 

@@ -27,13 +27,17 @@ import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
+import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.expressions.type.BooleanValueExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
-import io.luan.exp4j.expressions.type.ObjectExpression;
+import io.luan.exp4j.expressions.value.BooleanValueExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
+import io.luan.exp4j.expressions.value.ObjectExpression;
 import io.luan.exp4j.expressions.util.ExpressionUtil;
+import io.luan.exp4j.expressions.value.ValueExpression;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,17 +137,49 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
         Expression owner = expression.getOwner().accept(this);
         ObjectExpression ownerExp = (ObjectExpression)owner;
         Object ownerObj = ownerExp.getObject();
+        String name = expression.getName();
         try {
-            Field field = ownerObj.getClass().getField(expression.getName());
+            Field field = ownerObj.getClass().getField(name);
             Object result = field.get(ownerObj);
             return ExpressionUtil.objToExpression(result);
 
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return super.visitMember(expression);
+    }
+
+    @Override
+    public Expression visitMethod(MethodExpression expression) {
+        Expression owner = expression.getOwner().accept(this);
+        ObjectExpression ownerExp = (ObjectExpression)owner;
+        Object ownerObj = ownerExp.getObject();
+        String name = expression.getName();
+        try {
+            Class[] classes = new Class[expression.getParameters().length];
+            Object[] paramObjs = new Object[expression.getParameters().length];
+            for (int i = 0; i < expression.getParameters().length; i++) {
+                Expression paramExp = expression.getParameters()[i].accept(this);
+                if (!(paramExp instanceof ValueExpression)) {
+                    return super.visitMethod(expression);
+                }
+
+                paramObjs[i] =  ((ValueExpression)paramExp).getObject();
+                classes[i] = paramObjs[i].getClass();
+            }
+
+            for (Method m : ownerObj.getClass().getMethods()) {
+                System.out.println(m);
+            }
+
+            Method method = ownerObj.getClass().getMethod(name, classes);
+            Object result = method.invoke(ownerObj, paramObjs);
+            return ExpressionUtil.objToExpression(result);
+
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return super.visitMethod(expression);
     }
 
     @Override

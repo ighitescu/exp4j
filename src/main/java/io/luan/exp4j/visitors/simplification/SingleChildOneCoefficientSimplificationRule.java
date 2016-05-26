@@ -19,7 +19,7 @@ package io.luan.exp4j.visitors.simplification;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 
 /// <summary>
 /// Applies to SUM node, single child with coefficient == 1

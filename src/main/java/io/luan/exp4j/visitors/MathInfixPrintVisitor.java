@@ -30,8 +30,8 @@ import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.expressions.type.BooleanValueExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.BooleanValueExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.util.NumberFormatter;
 
 /// <summary>

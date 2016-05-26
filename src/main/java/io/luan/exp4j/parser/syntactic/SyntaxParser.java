@@ -160,7 +160,7 @@ public class SyntaxParser {
             case Variable:
                 return 0;
         }
-        throw new SyntaxParserException("Unrecognized SyntaxNode type: " + node.getType());
+        throw new SyntaxParserException("Unrecognized SyntaxNode value: " + node.getType());
     }
 
     private void handleTopOperator() {

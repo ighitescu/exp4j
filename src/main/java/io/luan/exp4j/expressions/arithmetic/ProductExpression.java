@@ -21,7 +21,7 @@ import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.base.BaseExpression;
-import io.luan.exp4j.expressions.type.NumberExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 
 public class ProductExpression extends BaseExpression {
 
