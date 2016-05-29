@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.operations.base;
+package io.luan.exp4j.operations.info;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.expressions.arithmetic.PowerExpression;
@@ -22,6 +22,7 @@ import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
+import io.luan.exp4j.operations.base.BaseExpressionVisitor;
 
 import java.util.HashSet;
 import java.util.Set;
