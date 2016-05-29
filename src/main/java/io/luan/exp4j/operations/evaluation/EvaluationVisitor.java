@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors;
+package io.luan.exp4j.operations.evaluation;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.expressions.NumericExpression;
@@ -24,22 +24,25 @@ import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.comparison.ComparisonExpression;
 import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
+import io.luan.exp4j.expressions.function.KnownFunctions;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
 import io.luan.exp4j.expressions.symbolic.MethodExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
+import io.luan.exp4j.expressions.util.ExpressionUtil;
 import io.luan.exp4j.expressions.value.BooleanValueExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.expressions.value.ObjectExpression;
-import io.luan.exp4j.expressions.util.ExpressionUtil;
 import io.luan.exp4j.expressions.value.ValueExpression;
+import io.luan.exp4j.operations.base.BaseExpressionVisitor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class EvaluationVisitor extends BaseExpressionVisitor {
 
@@ -51,7 +54,7 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
 
     public EvaluationVisitor(Map<String, Object> values) {
         if (values == null) {
-            values = new HashMap<String, Object>();
+            values = new HashMap<>();
         }
         this.values = values;
     }
@@ -116,6 +119,13 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
     }
 
     public Expression visitFunction(FunctionExpression expression) {
+
+        Function<NumericExpression[], NumericExpression> func;
+        func = KnownFunctions.getFunc(expression.getName());
+        if (func == null) {
+            return super.visitFunction(expression);
+        }
+
         NumericExpression[] paramExps = new NumericExpression[expression.getFuncParams().length];
 
         for (int i = 0; i < expression.getFuncParams().length; i++) {
@@ -128,14 +138,13 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
             }
         }
 
-        Expression result = expression.getFunc().apply(paramExps);
-        return result;
+        return func.apply(paramExps);
     }
 
     @Override
     public Expression visitMember(MemberExpression expression) {
         Expression owner = expression.getOwner().accept(this);
-        ObjectExpression ownerExp = (ObjectExpression)owner;
+        ObjectExpression ownerExp = (ObjectExpression) owner;
         Object ownerObj = ownerExp.getObject();
         String name = expression.getName();
         try {
@@ -152,7 +161,7 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
     @Override
     public Expression visitMethod(MethodExpression expression) {
         Expression owner = expression.getOwner().accept(this);
-        ObjectExpression ownerExp = (ObjectExpression)owner;
+        ObjectExpression ownerExp = (ObjectExpression) owner;
         Object ownerObj = ownerExp.getObject();
         String name = expression.getName();
         try {
@@ -164,7 +173,7 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
                     return super.visitMethod(expression);
                 }
 
-                paramObjs[i] =  ((ValueExpression)paramExp).getObject();
+                paramObjs[i] = ((ValueExpression) paramExp).getObject();
                 classes[i] = paramObjs[i].getClass();
             }
 

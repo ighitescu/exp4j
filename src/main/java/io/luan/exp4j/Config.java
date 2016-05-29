@@ -19,5 +19,5 @@ package io.luan.exp4j;
 public class Config {
     public static final boolean DEBUG = false;
     public static final boolean DEBUG_LEXER = false;
-    public static final boolean DEBUG_PARSER = true;
+    public static final boolean DEBUG_PARSER = false;
 }

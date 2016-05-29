@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors.simplification;
+package io.luan.exp4j.operations.simplification.rules;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
-import io.luan.exp4j.expressions.arithmetic.SumExpression;
+import io.luan.exp4j.expressions.value.NumberExpression;
 
 import java.util.ArrayList;
 
 /// <summary>
-///  Applies to PROD node
-/// 	If one of the child is a Sum Node with only ONE operand.
-/// 	Can merge the oprand to the PROD node, and move the weight to another oprand
+/// remove Zero Exponent term in a product node
 /// </summary>
-public class SingleChildSumProductSimplificationRule implements SimplificationRule {
+public class ZeroExponentSimplificationRule implements SimplificationRule {
 
     public Expression apply(Expression original) {
         ProductExpression prodExp = (ProductExpression) original;
@@ -37,25 +35,14 @@ public class SingleChildSumProductSimplificationRule implements SimplificationRu
         ArrayList<NumericExpression> newExponents = new ArrayList<NumericExpression>();
 
         for (int i = 0; i < prodExp.getOperands().length; i++) {
-            Expression op = prodExp.getOperands()[i];
-            if (op instanceof SumExpression) {
-                SumExpression sumNode = (SumExpression) op;
-                if (sumNode.getOperands().length == 1) {
-
-                    // Merge up the sumNode.Operand
-                    newOprands.add(sumNode.getOperands()[0]);
-                    newExponents.add(prodExp.getExponents()[i]);
-
-                    // Merge up the coefficient
-                    newOprands.add(sumNode.getCoefficients()[0]);
-                    newExponents.add(prodExp.getExponents()[i]);
-                }
-            } else {
+            if (!prodExp.getExponents()[i].equate(NumberExpression.Zero)) {
                 newOprands.add(prodExp.getOperands()[i]);
                 newExponents.add(prodExp.getExponents()[i]);
             }
         }
-
+        if (newOprands.size() == 0) {
+            return NumberExpression.One; // somehow no terms left, return ONE
+        }
         ProductExpression simplified = new ProductExpression(newOprands.toArray(new Expression[0]),
                 newExponents.toArray(new NumericExpression[0]));
         return simplified;
@@ -64,12 +51,9 @@ public class SingleChildSumProductSimplificationRule implements SimplificationRu
     public boolean canApply(Expression original) {
         if (original.getType() == ExpressionType.Product) {
             ProductExpression prodExp = (ProductExpression) original;
-            for (int i = 0; i < prodExp.getOperands().length; i++) {
-                if (prodExp.getOperands()[i].getType() == ExpressionType.Sum) {
-                    SumExpression sumNode = (SumExpression) prodExp.getOperands()[i];
-                    if (sumNode.getOperands().length == 1) {
-                        return true;
-                    }
+            for (NumericExpression exp : prodExp.getExponents()) {
+                if (exp.equate(NumberExpression.Zero)) {
+                    return true;
                 }
             }
         }

@@ -24,6 +24,9 @@ import io.luan.exp4j.parser.ExpressionParser;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExpressionParserTest {
 
     @Test
@@ -37,7 +40,7 @@ public class ExpressionParserTest {
 
     @Test
     public void testMethod() {
-        ExpressionParser parser = new ExpressionParser("a.b(c,d)");
+        ExpressionParser parser = new ExpressionParser("a.b(g(),d)");
         Expression exp = parser.parse();
 
         System.out.println(exp);
@@ -45,5 +48,19 @@ public class ExpressionParserTest {
         MethodExpression mExp = (MethodExpression) exp;
         Expression[] params = mExp.getParameters();
         Assert.assertEquals(2, params.length);
+    }
+
+    @Test
+    public void testFunction() {
+        ExpressionParser parser = new ExpressionParser("abs(x+ 4)");
+        Expression exp = parser.parse();
+
+        System.out.println(exp);
+        Assert.assertEquals(ExpressionType.Function, exp.getType());
+
+        Map<String, Object> input = new HashMap<>();
+        input.put("x", -5);
+        Expression result = exp.evaluate(input);
+        System.out.println(result);
     }
 }

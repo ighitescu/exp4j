@@ -20,10 +20,10 @@ import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
-import io.luan.exp4j.visitors.EvaluationVisitor;
-import io.luan.exp4j.visitors.MathInfixPrintVisitor;
-import io.luan.exp4j.visitors.SimplificationVisitor;
-import io.luan.exp4j.visitors.SubstitutionVisitor;
+import io.luan.exp4j.operations.evaluation.EvaluationVisitor;
+import io.luan.exp4j.operations.print.MathInfixPrintVisitor;
+import io.luan.exp4j.operations.simplification.SimplificationVisitor;
+import io.luan.exp4j.operations.substitution.SubstitutionVisitor;
 
 import java.util.Map;
 

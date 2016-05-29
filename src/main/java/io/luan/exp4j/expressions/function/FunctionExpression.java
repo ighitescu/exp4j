@@ -19,22 +19,16 @@ package io.luan.exp4j.expressions.function;
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.ExpressionVisitor;
-import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.base.BaseExpression;
-
-import java.util.function.Function;
 
 public class FunctionExpression extends BaseExpression {
 
     private String name;
     private Expression[] funcParams;
-    private Function<NumericExpression[], NumericExpression> func;
 
-    public FunctionExpression(String name, Expression[] parameters,
-                              Function<NumericExpression[], NumericExpression> func) {
+    public FunctionExpression(String name, Expression[] parameters) {
         this.name = name;
         this.funcParams = parameters;
-        this.func = func;
     }
 
     public Expression accept(ExpressionVisitor visitor) {
@@ -53,8 +47,7 @@ public class FunctionExpression extends BaseExpression {
                 return false;
             }
 
-            // BUG: For now assume perfectly ordered. For later use HashCode
-            // ordering
+            // TODO: For now assume perfectly ordered. For later use HashCode ordering
             for (int i = 0; i < funcParams.length; i++) {
                 if (!funcParams[i].equals(otherExp.funcParams[i])) {
                     return false;
@@ -66,8 +59,8 @@ public class FunctionExpression extends BaseExpression {
         return false;
     }
 
-    public Function<NumericExpression[], NumericExpression> getFunc() {
-        return func;
+    public int getSize() {
+        return 0;
     }
 
     public Expression[] getFuncParams() {
@@ -76,10 +69,6 @@ public class FunctionExpression extends BaseExpression {
 
     public String getName() {
         return name;
-    }
-
-    public int getSize() {
-        return 0;
     }
 
     public ExpressionType getType() {

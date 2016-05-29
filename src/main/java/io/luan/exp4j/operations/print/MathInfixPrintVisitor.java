@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors;
+package io.luan.exp4j.operations.print;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
@@ -33,6 +33,7 @@ import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.value.BooleanValueExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.util.NumberFormatter;
+import io.luan.exp4j.operations.base.BaseExpressionVisitor;
 
 /// <summary>
 /// This is used to print Expression as pretty Math expression.

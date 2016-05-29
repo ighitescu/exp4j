@@ -40,7 +40,7 @@ import io.luan.exp4j.parser.syntactic.SyntaxNodeType;
 import io.luan.exp4j.parser.syntactic.SyntaxParser;
 import io.luan.exp4j.parser.syntactic.SyntaxParserException;
 import io.luan.exp4j.util.NumberUtil;
-import io.luan.exp4j.visitors.EvaluationVisitor;
+import io.luan.exp4j.operations.evaluation.EvaluationVisitor;
 
 import java.util.ArrayList;
 
@@ -74,17 +74,7 @@ public class ExpressionParser {
             paramExps.add(nodeExp);
         }
 
-        // if (InternalFunctions.IsKnownFunction(name)) {
-        // var result = InternalFunctions.GetKnownFunction(name,
-        // paramExps.ToArray());
-        // if (result == null) {
-        // throw new Exception();
-        // }
-        // return result;
-        // }
-
-        // TODO: how to deal with external functions?
-        return new FunctionExpression(name, paramExps.toArray(new Expression[0]), null);
+        return new FunctionExpression(name, paramExps.toArray(new Expression[0]));
     }
 
     /**

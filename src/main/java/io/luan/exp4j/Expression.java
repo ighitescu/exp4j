@@ -22,8 +22,8 @@ import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.parser.ExpressionParser;
-import io.luan.exp4j.visitors.VariableVisitor;
-import io.luan.exp4j.visitors.algebra.DifferentiationVisitor;
+import io.luan.exp4j.operations.base.VariableVisitor;
+import io.luan.exp4j.operations.differentiation.DifferentiationVisitor;
 
 import java.util.Map;
 import java.util.Set;

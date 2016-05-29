@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors;
+package io.luan.exp4j.operations.base;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionVisitor;

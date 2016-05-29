@@ -27,6 +27,30 @@ import java.math.MathContext;
  */
 public class NumberUtil {
 
+    public static Number abs(Number number) {
+        if (number == null) {
+            return null;
+        }
+
+        if (number instanceof Integer) {
+            return (Integer) number >= 0 ? number : negate(number);
+        }
+
+        if (number instanceof Long) {
+            return (Long) number >= 0 ? number : negate(number);
+        }
+
+        if (number instanceof BigInteger) {
+            return ((BigInteger) number).compareTo(BigInteger.ZERO) >= 0 ? number : negate(number);
+        }
+
+        if (number instanceof BigDecimal) {
+            return ((BigDecimal) number).compareTo(BigDecimal.ZERO) >= 0 ? number : negate(number);
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
     public static Number add(Number left, Number right) {
         if (left == null || right == null) {
             return null;

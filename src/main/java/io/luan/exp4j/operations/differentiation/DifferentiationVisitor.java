@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors.algebra;
+package io.luan.exp4j.operations.differentiation;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.expressions.NumericExpression;
@@ -23,7 +23,7 @@ import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
-import io.luan.exp4j.visitors.BaseExpressionVisitor;
+import io.luan.exp4j.operations.base.BaseExpressionVisitor;
 
 import java.util.ArrayList;
 

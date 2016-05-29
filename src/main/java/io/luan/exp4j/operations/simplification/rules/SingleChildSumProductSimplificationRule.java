@@ -14,62 +14,64 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors.simplification;
+package io.luan.exp4j.operations.simplification.rules;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.arithmetic.ProductExpression;
+import io.luan.exp4j.expressions.arithmetic.SumExpression;
 
 import java.util.ArrayList;
 
 /// <summary>
-/// This merges the exponents of two or more oprands that are the same.
-/// Applies to Product Node
+///  Applies to PROD node
+/// 	If one of the child is a Sum Node with only ONE operand.
+/// 	Can merge the oprand to the PROD node, and move the weight to another oprand
 /// </summary>
-public class MergeExponentsSimplificationRule implements SimplificationRule {
+public class SingleChildSumProductSimplificationRule implements SimplificationRule {
 
-    /// <summary>
-    /// Applies ONLY if there can be two operands of the same value
-    /// Algorithm:
-    ///   For each oprand, check if it already exists in the new array, if not, add, otherwise, update the coefs
-    /// </summary>
     public Expression apply(Expression original) {
-        boolean success = false;
         ProductExpression prodExp = (ProductExpression) original;
         ArrayList<Expression> newOprands = new ArrayList<Expression>();
         ArrayList<NumericExpression> newExponents = new ArrayList<NumericExpression>();
 
         for (int i = 0; i < prodExp.getOperands().length; i++) {
-            boolean exists = false;
-            for (int j = 0; j < newOprands.size(); j++) {
-                if (newOprands.get(j).equals(prodExp.getOperands()[i])) {
-                    // Already exists, just update the coef
-                    newExponents.set(j, newExponents.get(j).add(prodExp.getExponents()[i]));
-                    exists = true;
-                    success = true;
-                }
-            }
+            Expression op = prodExp.getOperands()[i];
+            if (op instanceof SumExpression) {
+                SumExpression sumNode = (SumExpression) op;
+                if (sumNode.getOperands().length == 1) {
 
-            if (!exists) {
+                    // Merge up the sumNode.Operand
+                    newOprands.add(sumNode.getOperands()[0]);
+                    newExponents.add(prodExp.getExponents()[i]);
+
+                    // Merge up the coefficient
+                    newOprands.add(sumNode.getCoefficients()[0]);
+                    newExponents.add(prodExp.getExponents()[i]);
+                }
+            } else {
                 newOprands.add(prodExp.getOperands()[i]);
                 newExponents.add(prodExp.getExponents()[i]);
             }
         }
 
-        if (success) {
-            ProductExpression simplified = new ProductExpression(newOprands.toArray(new Expression[0]),
-                    newExponents.toArray(new NumericExpression[0]));
-            return simplified;
-        }
-        return original;
+        ProductExpression simplified = new ProductExpression(newOprands.toArray(new Expression[0]),
+                newExponents.toArray(new NumericExpression[0]));
+        return simplified;
     }
 
     public boolean canApply(Expression original) {
-        // Can be applied if there is more than one oprand.
         if (original.getType() == ExpressionType.Product) {
             ProductExpression prodExp = (ProductExpression) original;
-            return prodExp.getOperands().length > 1;
+            for (int i = 0; i < prodExp.getOperands().length; i++) {
+                if (prodExp.getOperands()[i].getType() == ExpressionType.Sum) {
+                    SumExpression sumNode = (SumExpression) prodExp.getOperands()[i];
+                    if (sumNode.getOperands().length == 1) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }

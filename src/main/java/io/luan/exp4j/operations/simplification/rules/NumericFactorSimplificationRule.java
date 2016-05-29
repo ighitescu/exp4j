@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors.simplification;
+package io.luan.exp4j.operations.simplification.rules;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;

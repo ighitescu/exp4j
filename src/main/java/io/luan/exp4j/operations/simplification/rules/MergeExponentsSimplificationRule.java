@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors.simplification;
+package io.luan.exp4j.operations.simplification.rules;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
 import io.luan.exp4j.expressions.NumericExpression;
-import io.luan.exp4j.expressions.arithmetic.SumExpression;
+import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 
 import java.util.ArrayList;
 
 /// <summary>
-/// This merges the coefficients of two or more oprands that are the same.
-/// Applies to SumNode
+/// This merges the exponents of two or more oprands that are the same.
+/// Applies to Product Node
 /// </summary>
-public class MergeCoefficientsSimplificationRule implements SimplificationRule {
+public class MergeExponentsSimplificationRule implements SimplificationRule {
 
     /// <summary>
     /// Applies ONLY if there can be two operands of the same value
@@ -36,29 +36,30 @@ public class MergeCoefficientsSimplificationRule implements SimplificationRule {
     /// </summary>
     public Expression apply(Expression original) {
         boolean success = false;
-        SumExpression sumExp = (SumExpression) original;
+        ProductExpression prodExp = (ProductExpression) original;
         ArrayList<Expression> newOprands = new ArrayList<Expression>();
-        ArrayList<NumericExpression> newCoefs = new ArrayList<NumericExpression>();
+        ArrayList<NumericExpression> newExponents = new ArrayList<NumericExpression>();
 
-        for (int i = 0; i < sumExp.getOperands().length; i++) {
+        for (int i = 0; i < prodExp.getOperands().length; i++) {
             boolean exists = false;
             for (int j = 0; j < newOprands.size(); j++) {
-                if (newOprands.get(j).equals(sumExp.getOperands()[i])) {
+                if (newOprands.get(j).equals(prodExp.getOperands()[i])) {
                     // Already exists, just update the coef
-                    newCoefs.set(j, newCoefs.get(j).add(sumExp.getCoefficients()[i]));
+                    newExponents.set(j, newExponents.get(j).add(prodExp.getExponents()[i]));
                     exists = true;
                     success = true;
                 }
             }
 
             if (!exists) {
-                newOprands.add(sumExp.getOperands()[i]);
-                newCoefs.add(sumExp.getCoefficients()[i]);
+                newOprands.add(prodExp.getOperands()[i]);
+                newExponents.add(prodExp.getExponents()[i]);
             }
         }
 
         if (success) {
-            SumExpression simplified = new SumExpression(newOprands.toArray(new Expression[0]), newCoefs.toArray(new NumericExpression[0]));
+            ProductExpression simplified = new ProductExpression(newOprands.toArray(new Expression[0]),
+                    newExponents.toArray(new NumericExpression[0]));
             return simplified;
         }
         return original;
@@ -66,9 +67,9 @@ public class MergeCoefficientsSimplificationRule implements SimplificationRule {
 
     public boolean canApply(Expression original) {
         // Can be applied if there is more than one oprand.
-        if (original.getType() == ExpressionType.Sum) {
-            SumExpression sumExp = (SumExpression) original;
-            return sumExp.getOperands().length > 1;
+        if (original.getType() == ExpressionType.Product) {
+            ProductExpression prodExp = (ProductExpression) original;
+            return prodExp.getOperands().length > 1;
         }
         return false;
     }

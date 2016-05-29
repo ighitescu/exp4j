@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.visitors;
+package io.luan.exp4j.operations.simplification;
 
 import io.luan.exp4j.Expression;
 import io.luan.exp4j.ExpressionType;
@@ -23,7 +23,8 @@ import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
 import io.luan.exp4j.expressions.NumericExpression;
-import io.luan.exp4j.visitors.simplification.*;
+import io.luan.exp4j.operations.simplification.rules.*;
+import io.luan.exp4j.operations.base.BaseExpressionVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class SimplificationVisitor extends BaseExpressionVisitor {
         }
 
         if (success) {
-            FunctionExpression newFunc = new FunctionExpression(expression.getName(), newParams.toArray(new Expression[0]), expression.getFunc());
+            FunctionExpression newFunc = new FunctionExpression(expression.getName(), newParams.toArray(new Expression[0]));
             return newFunc.accept(this);
         }
         return super.visitFunction(expression);
@@ -105,7 +106,7 @@ public class SimplificationVisitor extends BaseExpressionVisitor {
             }
         }
 
-        // If reach to this point, there is no simplification rule applied.
+        // If reach to this point, there is no rules rule applied.
         // If no rule is applied, then should try to simplify children nodes
         boolean success = false;
         ArrayList<Expression> newOprands = new ArrayList<Expression>();
@@ -136,7 +137,7 @@ public class SimplificationVisitor extends BaseExpressionVisitor {
             }
         }
 
-        // If reach to this point, there is no simplification rule applied.
+        // If reach to this point, there is no rules rule applied.
         // If no rule is applied, then should try to simplify children nodes
         boolean success = false;
         ArrayList<Expression> newOprands = new ArrayList<Expression>();
