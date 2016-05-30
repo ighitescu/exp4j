@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package io.luan.exp4j.expressions.function;
+package io.luan.exp4j.util;
 
 import io.luan.exp4j.expressions.NumericExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
-import io.luan.exp4j.util.NumberUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +29,9 @@ import java.util.function.Function;
  */
 public class KnownFunctions {
 
-    public static Function<NumericExpression[], NumericExpression> ABS;
+    public static Function<Number[], Number> ABS;
 
-    private static Map<String, Function<NumericExpression[], NumericExpression>> funcMap;
+    private static Map<String, Function<Number[], Number>> funcMap;
 
     static {
         ABS = KnownFunctions::abs;
@@ -40,31 +39,21 @@ public class KnownFunctions {
         fillKnownFunctions();
     }
 
-    public static Function<NumericExpression[], NumericExpression> getFunc(String name) {
-        return funcMap.get(name);
-    }
-
-    private static NumericExpression abs(NumericExpression[] params) {
+    private static Number abs(Number[] params) {
         if (params.length != 1) {
             throw new IllegalArgumentException("params.length != 1");
         }
 
-        NumericExpression exp = params[0];
-        if (exp instanceof NumberExpression) {
-            NumberExpression numExp = (NumberExpression) exp;
-            Number num = numExp.getNumber();
-            Number absNum = NumberUtil.abs(num);
-            if (num.equals(absNum)) {
-                return exp;
-            }
-            return new NumberExpression(absNum);
-        }
-
-        throw new IllegalArgumentException("Input must be a NumberExpression");
+        Number num = params[0];
+        return NumberUtil.abs(num);
     }
 
     private static void fillKnownFunctions() {
         funcMap = new HashMap<>();
         funcMap.put("abs", ABS);
+    }
+
+    public static Function<Number[], Number> getFunc(String name) {
+        return funcMap.get(name);
     }
 }

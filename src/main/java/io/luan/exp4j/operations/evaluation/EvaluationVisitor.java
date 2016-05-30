@@ -24,7 +24,7 @@ import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.comparison.ComparisonExpression;
 import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
-import io.luan.exp4j.expressions.function.KnownFunctions;
+import io.luan.exp4j.util.KnownFunctions;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
@@ -47,16 +47,26 @@ import java.util.function.Function;
 public class EvaluationVisitor extends BaseExpressionVisitor {
 
     private Map<String, Object> values;
+    private Map<String, Function<Number[],Number>> funcs;
 
     public EvaluationVisitor() {
         this(null);
     }
 
     public EvaluationVisitor(Map<String, Object> values) {
+        this(values, null);
+    }
+
+    public EvaluationVisitor(Map<String, Object> values, Map<String, Function<Number[],Number>> funcs) {
         if (values == null) {
             values = new HashMap<>();
         }
         this.values = values;
+
+        if (funcs == null) {
+            funcs = new HashMap<>();
+        }
+        this.funcs = funcs;
     }
 
     public Map<String, Object> getValues() {
@@ -120,25 +130,28 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
 
     public Expression visitFunction(FunctionExpression expression) {
 
-        Function<NumericExpression[], NumericExpression> func;
-        func = KnownFunctions.getFunc(expression.getName());
+        Function<Number[], Number> func = funcs.get(expression.getName());
+        if (func == null) {
+            func = KnownFunctions.getFunc(expression.getName());
+        }
         if (func == null) {
             return super.visitFunction(expression);
         }
 
-        NumericExpression[] paramExps = new NumericExpression[expression.getFuncParams().length];
+        Number[] params = new Number[expression.getFuncParams().length];
 
         for (int i = 0; i < expression.getFuncParams().length; i++) {
             Expression param = expression.getFuncParams()[i].accept(this);
-            if (param instanceof NumericExpression) {
-                paramExps[i] = (NumericExpression) param;
+            if (param instanceof NumberExpression) {
+                params[i] =( (NumberExpression) param).getNumber();
             } else {
                 // sub expression cannot be evaluated, return self.
                 return super.visitFunction(expression);
             }
         }
 
-        return func.apply(paramExps);
+        Number result = func.apply(params);
+        return new NumberExpression(result);
     }
 
     @Override

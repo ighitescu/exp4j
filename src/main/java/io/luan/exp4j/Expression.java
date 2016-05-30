@@ -27,6 +27,7 @@ import io.luan.exp4j.operations.differentiation.DifferentiationVisitor;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public interface Expression {
 
@@ -110,6 +111,7 @@ public interface Expression {
     boolean equals(Expression other);
 
     Expression evaluate(Map<String, Object> values);
+    Expression evaluate(Map<String, Object> values, Map<String, Function<Number[],Number>> funcs);
 
     /**
      * Size of the expression tree
