@@ -52,8 +52,8 @@ public abstract class BaseExpression implements Expression {
     }
 
     @Override
-    public Expression evaluate(Map<String, Object> values,Map<String, Function<Number[],Number>> funcs) {
-        ExpressionVisitor evalVisitor = new EvaluationVisitor(values, funcs);
+    public Expression evaluate(Map<String, Object> values,Map<String, Object> funcObjects) {
+        ExpressionVisitor evalVisitor = new EvaluationVisitor(values, funcObjects);
         return accept(evalVisitor).simplify();
     }
 

@@ -24,7 +24,6 @@ import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.comparison.ComparisonExpression;
 import io.luan.exp4j.expressions.conditional.ConditionalExpression;
 import io.luan.exp4j.expressions.function.FunctionExpression;
-import io.luan.exp4j.util.KnownFunctions;
 import io.luan.exp4j.expressions.logical.LogicalAndExpression;
 import io.luan.exp4j.expressions.logical.LogicalNotExpression;
 import io.luan.exp4j.expressions.symbolic.MemberExpression;
@@ -36,18 +35,18 @@ import io.luan.exp4j.expressions.value.NumberExpression;
 import io.luan.exp4j.expressions.value.ObjectExpression;
 import io.luan.exp4j.expressions.value.ValueExpression;
 import io.luan.exp4j.operations.base.BaseExpressionVisitor;
+import io.luan.exp4j.util.KnownFunctions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class EvaluationVisitor extends BaseExpressionVisitor {
 
     private Map<String, Object> values;
-    private Map<String, Function<Number[],Number>> funcs;
+    private Map<String, Object> funcObjects;
 
     public EvaluationVisitor() {
         this(null);
@@ -57,16 +56,16 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
         this(values, null);
     }
 
-    public EvaluationVisitor(Map<String, Object> values, Map<String, Function<Number[],Number>> funcs) {
+    public EvaluationVisitor(Map<String, Object> values, Map<String, Object> funcObjects) {
         if (values == null) {
             values = new HashMap<>();
         }
         this.values = values;
 
-        if (funcs == null) {
-            funcs = new HashMap<>();
+        if (funcObjects == null) {
+            funcObjects = new HashMap<>();
         }
-        this.funcs = funcs;
+        this.funcObjects = funcObjects;
     }
 
     public Map<String, Object> getValues() {
@@ -130,28 +129,79 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
 
     public Expression visitFunction(FunctionExpression expression) {
 
-        Function<Number[], Number> func = funcs.get(expression.getName());
-        if (func == null) {
-            func = KnownFunctions.getFunc(expression.getName());
-        }
-        if (func == null) {
-            return super.visitFunction(expression);
-        }
+//        Function<Number[], Number> func = funcs.get(expression.getName());
+//        if (func == null) {
+//            func = KnownFunctions.getFunc(expression.getName());
+//        }
+//        if (func == null) {
+//            return super.visitFunction(expression);
+//        }
 
         Number[] params = new Number[expression.getFuncParams().length];
 
         for (int i = 0; i < expression.getFuncParams().length; i++) {
             Expression param = expression.getFuncParams()[i].accept(this);
             if (param instanceof NumberExpression) {
-                params[i] =( (NumberExpression) param).getNumber();
+                params[i] = ((NumberExpression) param).getNumber();
             } else {
                 // sub expression cannot be evaluated, return self.
                 return super.visitFunction(expression);
             }
         }
 
-        Number result = func.apply(params);
-        return new NumberExpression(result);
+        Object funcObj = funcObjects.get(expression.getName());
+        if (funcObj != null) {
+
+            Method[] methods = funcObj.getClass().getMethods();
+            for (Method method : methods) {
+                if (method.getName().equals(expression.getName())) {
+                    try {
+                        Object result = method.invoke(funcObj, params);
+                        Number numResult = (Number) result;
+                        return new NumberExpression(numResult);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            //  Method method = funcObj.getClass().getMethod(expression.getName());
+
+        }
+        Object result = KnownFunctions.invoke(expression.getName(), params);
+        Number numResult = (Number) result;
+        return new NumberExpression(numResult);
+    }
+
+    @Override
+    public Expression visitLogicalAnd(LogicalAndExpression expression) {
+        for (int i = 0; i < expression.getOperands().length; i++) {
+            Expression exp = expression.getOperands()[i].accept(this);
+            if (exp instanceof BooleanValueExpression) {
+                BooleanValueExpression boolExp = (BooleanValueExpression) exp;
+                if (!boolExp.getBooleanValue()) {
+                    return BooleanValueExpression.False;
+                }
+            } else {
+                // Sub Expression cannot be evaluated. Return self
+                return super.visitLogicalAnd(expression);
+            }
+        }
+        return BooleanValueExpression.True;
+    }
+
+    @Override
+    public Expression visitLogicalNot(LogicalNotExpression expression) {
+        Expression operand = expression.getOperand().accept(this);
+        if (operand instanceof BooleanValueExpression) {
+            if (((BooleanValueExpression) operand).getBooleanValue()) {
+                return BooleanValueExpression.False;
+            } else {
+                return BooleanValueExpression.True;
+            }
+        }
+        return super.visitLogicalNot(expression);
     }
 
     @Override
@@ -202,36 +252,6 @@ public class EvaluationVisitor extends BaseExpressionVisitor {
             e.printStackTrace();
         }
         return super.visitMethod(expression);
-    }
-
-    @Override
-    public Expression visitLogicalAnd(LogicalAndExpression expression) {
-        for (int i = 0; i < expression.getOperands().length; i++) {
-            Expression exp = expression.getOperands()[i].accept(this);
-            if (exp instanceof BooleanValueExpression) {
-                BooleanValueExpression boolExp = (BooleanValueExpression) exp;
-                if (!boolExp.getBooleanValue()) {
-                    return BooleanValueExpression.False;
-                }
-            } else {
-                // Sub Expression cannot be evaluated. Return self
-                return super.visitLogicalAnd(expression);
-            }
-        }
-        return BooleanValueExpression.True;
-    }
-
-    @Override
-    public Expression visitLogicalNot(LogicalNotExpression expression) {
-        Expression operand = expression.getOperand().accept(this);
-        if (operand instanceof BooleanValueExpression) {
-            if (((BooleanValueExpression) operand).getBooleanValue()) {
-                return BooleanValueExpression.False;
-            } else {
-                return BooleanValueExpression.True;
-            }
-        }
-        return super.visitLogicalNot(expression);
     }
 
     @Override

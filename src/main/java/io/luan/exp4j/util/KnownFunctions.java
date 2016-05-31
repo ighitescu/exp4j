@@ -16,12 +16,11 @@
 
 package io.luan.exp4j.util;
 
-import io.luan.exp4j.expressions.NumericExpression;
-import io.luan.exp4j.expressions.value.NumberExpression;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * A set of functions known by the system.
@@ -29,31 +28,43 @@ import java.util.function.Function;
  */
 public class KnownFunctions {
 
-    public static Function<Number[], Number> ABS;
-
-    private static Map<String, Function<Number[], Number>> funcMap;
+    private static Map<String, Method> methodMap;
 
     static {
-        ABS = KnownFunctions::abs;
-
         fillKnownFunctions();
     }
 
-    private static Number abs(Number[] params) {
-        if (params.length != 1) {
-            throw new IllegalArgumentException("params.length != 1");
-        }
-
-        Number num = params[0];
+    public static Number abs(Number num) {
         return NumberUtil.abs(num);
     }
 
-    private static void fillKnownFunctions() {
-        funcMap = new HashMap<>();
-        funcMap.put("abs", ABS);
+    public static Object invoke(String name, Object[] params) {
+        Method method = methodMap.get(name);
+        if (method == null) {
+            return null;
+        }
+
+        try {
+            return method.invoke(new Object(), params);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static Function<Number[], Number> getFunc(String name) {
-        return funcMap.get(name);
+    private static void fillKnownFunctions() {
+        methodMap = new HashMap<>();
+        Method[] methods = KnownFunctions.class.getMethods();
+        for (Method method : methods) {
+            System.out.println(method);
+            if (method.getModifiers() == (Modifier.STATIC | Modifier.PUBLIC)) {
+                if (!method.getName().equals("invoke")) {
+                    methodMap.put(method.getName(), method);
+                }
+            }
+        }
     }
 }
