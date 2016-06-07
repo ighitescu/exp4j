@@ -21,13 +21,12 @@ import io.luan.exp4j.expressions.arithmetic.ProductExpression;
 import io.luan.exp4j.expressions.arithmetic.SumExpression;
 import io.luan.exp4j.expressions.symbolic.VariableExpression;
 import io.luan.exp4j.expressions.value.NumberExpression;
-import io.luan.exp4j.parser.ExpressionParser;
-import io.luan.exp4j.operations.info.VariableVisitor;
 import io.luan.exp4j.operations.differentiation.DifferentiationVisitor;
+import io.luan.exp4j.operations.info.VariableVisitor;
+import io.luan.exp4j.parser.ExpressionParser;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 public interface Expression {
 
@@ -111,7 +110,14 @@ public interface Expression {
     boolean equals(Expression other);
 
     Expression evaluate(Map<String, Object> values);
-    Expression evaluate(Map<String, Object> values, Map<String, Function<Number[],Number>> funcs);
+
+    /**
+     * Evaluate the expression based on input values and functions(methods)
+     * @param values the input values, using name as key
+     * @param funcObjects the objects where a public static method exists with the same name
+     * @return an expression of which the value is represented.
+     */
+    Expression evaluate(Map<String, Object> values, Map<String, Object> funcObjects);
 
     /**
      * Size of the expression tree

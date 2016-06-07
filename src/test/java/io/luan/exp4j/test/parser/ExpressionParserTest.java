@@ -28,7 +28,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class ExpressionParserTest {
@@ -43,6 +42,19 @@ public class ExpressionParserTest {
         public TestMethodObj(int x) {
             this.b = x;
         }
+
+        public int sum(int a, int b) {
+            return a + b;
+        }
+    }
+
+    @Test
+    public void testKnownFunction() {
+        Expression exp = Expression.parse("abs(-1)");
+        Map<String, Object> input = new HashMap<>();
+
+        Expression result = exp.evaluate(input);
+        System.out.println(result);
     }
 
     @Test
@@ -56,8 +68,8 @@ public class ExpressionParserTest {
         Map<String, Object> input = new HashMap<>();
         input.put("x", 3);
 
-        Map<String, Function<Number[], Number>> funcs = new HashMap<>();
-        funcs.put("sum", (values) -> NumberUtil.add(values[0], values[1]));
+        Map<String, Object> funcs = new HashMap<>();
+        funcs.put("sum", new TestMethodObj(1));
 
         Expression result = exp.evaluate(input, funcs);
         System.out.println(result);
@@ -80,7 +92,7 @@ public class ExpressionParserTest {
         Assert.assertEquals(result.getType(), ExpressionType.Number);
         NumberExpression numExp = (NumberExpression) result;
         Integer intVal = (Integer) numExp.getNumber();
-        Assert.assertEquals(203, (int)intVal);
+        Assert.assertEquals(203, (int) intVal);
     }
 
     @Test
